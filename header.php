@@ -154,12 +154,17 @@ if (!defined('ABSPATH')) {
         } elseif (is_tax()) {
             $hero_title = single_term_title('', false);
         }
+    }
 
-        $hero_title = "<h1>$hero_title</h1>";
+    if (get_field('hero_title_tag', $post_id)) {
+        $hero_title_tag = get_field('hero_title_tag', $post_id);
+    } else {
+        $hero_title_tag = "h1";
     }
 
     $args = array(
         "hero_title" => $hero_title,
+        "hero_title_tag" => $hero_title_tag,
         "hero_image_desktop_default" => $hero_image_desktop,
         "hero_image_tablet_default" => $hero_image_tablet,
         "hero_image_mobile_default" => $hero_image_mobile,

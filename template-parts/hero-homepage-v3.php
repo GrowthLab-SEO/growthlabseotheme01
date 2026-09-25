@@ -20,9 +20,6 @@ $bg_mobile = isset($background_mobile) && $background_mobile ? $background_mobil
 if (!$bg_desktop) $bg_desktop = [];
 if (!$bg_tablet) $bg_tablet = [];
 if (!$bg_mobile) $bg_mobile = [];
-
-//Title Values
-$hero_title_tag = $hero_title_tag ?? null;
 ?>
 <section id="hero" class="hero hero--v3">
 
@@ -35,7 +32,7 @@ $hero_title_tag = $hero_title_tag ?? null;
 
                     <?php
                     print_title($hero_tagline, $hero_tagline_tag, "content-box__tagline");
-                    print_title($hero_title, $hero_title_tag, "content-box__title", true);
+                    print_title($args["hero_title"], $args["hero_title_tag"], "content-box__title", true);
                     print_title($hero_subtitle, $hero_subtitle_tag, "content-box__subtitle", true);
                     ?>
 

@@ -20,9 +20,6 @@ $bg_mobile = isset($background_mobile) && $background_mobile ? $background_mobil
 if (!$bg_desktop) $bg_desktop = [];
 if (!$bg_tablet) $bg_tablet = [];
 if (!$bg_mobile) $bg_mobile = [];
-
-//Title Values
-$hero_title_tag = $hero_title_tag ?? null;
 ?>
 <section id="hero" class="hero">
 
@@ -31,7 +28,7 @@ $hero_title_tag = $hero_title_tag ?? null;
     <div class="hero__wrapper container border-box">
         <div class="hero__content tx-center">
             <?php
-            print_title($args["hero_title"], $hero_title_tag, "hero__title", true);
+            print_title($args["hero_title"], $args["hero_title_tag"], "hero__title", true);
             get_template_part('template-parts/ampersand', 'separator', array('classes' => 'hero__separator'));
             ?>
 
