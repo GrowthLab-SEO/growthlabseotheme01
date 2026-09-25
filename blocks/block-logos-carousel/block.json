@@ -7,7 +7,7 @@
   "icon": "block-default",
   "keywords": ["growthlabseo", "carousel", "logos"],
   "acf": {
-    "mode": "edit",
+    "renderPreview": false,
     "renderTemplate": "block.php"
   },
   "supports": {
