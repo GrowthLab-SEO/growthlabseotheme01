@@ -68,7 +68,7 @@ if (get_field('toggle_block')):
                             <?php endif ?>
 
                             <div class="form-box__form">
-                                <?php gravity_form($contact_form, display_title: false, display_description: false); ?>
+                                <?php render_gravity_form($contact_form, display_title: false, display_description: false); ?>
                             </div>
 
                             <?php if (isset($message_before_submit) && $message_before_submit): ?>

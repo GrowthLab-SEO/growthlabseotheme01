@@ -57,6 +57,15 @@ function print_title($title, $tag = 'p', $classes = '', $is_hero = false)
     echo "<$tag class='$classes'>" . $title . "</$tag>";
 }
 
+//Render a Gravity Forms form only if the plugin is active
+if (!function_exists('render_gravity_form')) {
+    function render_gravity_form(...$args)
+    {
+        if (!function_exists('gravity_form')) return;
+        return gravity_form(...$args);
+    }
+}
+
 //Debug helper
 function dd($data)
 {
