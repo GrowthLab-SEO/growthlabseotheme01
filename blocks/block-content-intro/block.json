@@ -2,7 +2,6 @@
   "name": "acf/content-intro",
   "title": "Content Intro",
   "style": ["file:./block-min.css"],
-  "script": ["file:./block-min.js"],
   "category": "growthlabseotheme01-blocks",
   "icon": "block-default",
   "keywords": ["growthlabseo", "cta", "content", "picture", "caption"],
