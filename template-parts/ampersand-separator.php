@@ -13,7 +13,7 @@ $options = get_field_options('options' . $es);
     if (isset($options["logo_symbol"]) && $options["logo_symbol"]) {
         img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium");
     } else {
-        include get_stylesheet_directory() . '/assets/img/ampersand-symbol.svg';
+        include get_stylesheet_directory() . '/assets/img/separator-symbol.svg';
     }
     ?>
     <hr>
