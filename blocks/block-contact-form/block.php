@@ -19,7 +19,7 @@ if (get_field('toggle_block')):
             echo "bg-bicolor";
         }
         ?>"
-        <?php if (isset($extract_block_from_content) && $extract_block_from_content && !$show_only_contact_form) echo "data-extract='$place'"; ?>>
+        <?= get_block_extract_attribute(($extract_block_from_content ?? false) && !$show_only_contact_form, $place ?? '') ?>>
 
         <div class="contact-form__layer">
 

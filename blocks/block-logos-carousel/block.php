@@ -10,7 +10,7 @@ if (get_field('toggle_block')):
     <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block logos-carousel <?php if (!$background_color) echo 'bg-bicolor'; ?>"
         <?php
-        if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'";
+        echo get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '');
         if ($background_color) "style='background-color: $background_color'";
         ?>>
 

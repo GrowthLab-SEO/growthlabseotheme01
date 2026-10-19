@@ -7,11 +7,12 @@ if (get_field('toggle_block')):
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
     foreach (get_fields() as $key => $value) $$key = $value;
+    if (isset($featured_image) && is_array($featured_image)) $featured_image['position'] = get_valid_field_choice('featured_image.position', $featured_image['position'] ?? '');
 ?>
 
     <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block content-intro <?php if (!$background_image) echo "bg-bicolor"; ?>"
-        <?php if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'"; ?>>
+        <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
         if (isset($background_image) && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "content-intro__bg bg-image gradient-overlay");
@@ -43,7 +44,7 @@ if (get_field('toggle_block')):
                         isset($featured_image['picture']) && $featured_image['picture']
                         && $featured_image['position'] !== "below"
                     ): ?>
-                        <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= $featured_image['position'] ?>">
+                        <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= esc_attr($featured_image['position']) ?>">
                             <?php
                             img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "content", classes: "content-intro__pic");
                             if (isset($featured_image['picture_caption']) && $featured_image['picture_caption']):
@@ -76,7 +77,7 @@ if (get_field('toggle_block')):
                         isset($featured_image['picture']) && $featured_image['picture']
                         && $featured_image['position'] === "below"
                     ): ?>
-                        <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= $featured_image['position'] ?>">
+                        <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= esc_attr($featured_image['position']) ?>">
                             <?php
                             img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "medium", classes: "content-intro__pic");
                             if (isset($featured_image['picture_caption']) && $featured_image['picture_caption']):

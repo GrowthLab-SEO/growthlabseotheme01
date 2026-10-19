@@ -7,11 +7,13 @@ if (get_field('toggle_block')):
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
     foreach (get_fields() as $key => $value) $$key = $value;
+    $box_position = get_valid_field_choice('box_position', $box_position ?? '');
+    $block_style = get_valid_field_choice('block_style', $block_style ?? '');
 ?>
 
     <section<?= get_block_id_attribute($block_id ?? '') ?>
-        class="block cta-box <?= $box_position ?? "" ?> <?= $block_style ?? "" ?>  <?php if ($box_position === "within" || ($box_position === "full" && !$background_image)) echo "bg-bicolor"; ?>"
-        <?php if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'"; ?>>
+        class="block cta-box <?= esc_attr($box_position ?? "") ?> <?= esc_attr($block_style ?? "") ?>  <?php if ($box_position === "within" || ($box_position === "full" && !$background_image)) echo "bg-bicolor"; ?>"
+        <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
         if ($box_position === "full" && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "cta-box__bg bg-image gradient-overlay");

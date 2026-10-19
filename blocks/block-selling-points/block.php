@@ -10,7 +10,7 @@ if (get_field('toggle_block')):
     <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block selling-points bg-bicolor"
         <?php
-        if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'";
+        echo get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '');
         ?>>
 
         <div class="selling-points__wrapper container">
