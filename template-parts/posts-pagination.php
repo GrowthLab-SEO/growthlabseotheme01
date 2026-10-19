@@ -7,6 +7,7 @@ $args = wp_parse_args($args, array(
     'classes' => '',
     'paged' => max(1, (int) get_query_var('paged', 1)),
     'query' => null,
+    'page_arg' => '', // Custom query arg for the page number (e.g. grid-2-page); empty uses /page/N/
     'prev_text' => null,
     'next_text' => null,
     'mid_size' => 2,
@@ -35,8 +36,22 @@ $next_arrow = '
             <span class="arrow__placeholder">Next</span>
         ';
 
-$pagination = paginate_links(array(
+$links_args = array(
     'format' => 'page/%#%/',
+);
+
+if (!empty($args['page_arg'])) {
+    // Keep the current path (including another grid's /page/N/) and paginate with the custom query arg.
+    // paginate_links() re-adds the other current query args, so other grids keep their pages.
+    $page_arg = sanitize_key($args['page_arg']);
+    $current_url = set_url_scheme('http://' . $_SERVER['HTTP_HOST'] . wp_unslash($_SERVER['REQUEST_URI']));
+    $links_args = array(
+        'base' => explode('?', $current_url)[0] . '%_%',
+        'format' => '?' . $page_arg . '=%#%',
+    );
+}
+
+$pagination = paginate_links($links_args + array(
     'current' => max(1, $paged),
     'total' => $query->max_num_pages,
     'prev_text' => $prev_arrow,

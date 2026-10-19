@@ -7,9 +7,16 @@ if (get_field('toggle_block')):
     foreach (get_block_fields($block) as $key => $value) $$key = $value;
     $grid_type = get_valid_field_choice('grid_type', $grid_type ?? '');
 
-    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    if (is_front_page()) {
-        $paged = (get_query_var('page')) ? get_query_var('page') : 1;
+    // The first grid of the page uses paged/page; additional grids paginate with their own query arg
+    $page_arg = get_next_posts_grid_page_arg();
+
+    if ($page_arg !== '') {
+        $paged = max(1, absint($_GET[$page_arg] ?? 1));
+    } else {
+        $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+        if (is_front_page()) {
+            $paged = (get_query_var('page')) ? get_query_var('page') : 1;
+        }
     }
 
     $args = array(
@@ -197,6 +204,7 @@ if (get_field('toggle_block')):
                     get_template_part('template-parts/posts', 'pagination', array(
                         'paged' => $paged,
                         'query' => $query,
+                        'page_arg' => $page_arg,
                         'classes' => 'case-results__pagination'
                     ));
                 }

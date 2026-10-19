@@ -129,6 +129,19 @@ if (!function_exists('get_block_extract_attribute')) {
     }
 }
 
+// Numbers the posts grids rendered in the current request and returns the query arg each one paginates with.
+// The first grid returns '' and keeps using WordPress' paged/page var, so existing URLs keep working; every
+// additional grid gets its own arg (grid-2-page, grid-3-page...) so paginating one grid doesn't paginate the others.
+if (!function_exists('get_next_posts_grid_page_arg')) {
+    function get_next_posts_grid_page_arg()
+    {
+        static $grid_count = 0;
+        $grid_count++;
+
+        return $grid_count === 1 ? '' : 'grid-' . $grid_count . '-page';
+    }
+}
+
 // Returns the current block's ACF values with every field of its field groups present. Fields that were never saved
 // (e.g. added after the block was created) get their ACF default value, so templates can keep extracting them into
 // variables without undefined variable warnings. Empty defaults are null, so isset() checks keep working as before.
