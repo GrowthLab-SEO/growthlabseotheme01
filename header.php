@@ -25,6 +25,7 @@ if (!defined('ABSPATH')) {
 
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
+    $options = fill_acf_group_defaults($options, 'options', 'option');
     foreach ($options as $key => $value) $$key = $value;
 
     $logo_link = esc_url(home_url('/' . $es));

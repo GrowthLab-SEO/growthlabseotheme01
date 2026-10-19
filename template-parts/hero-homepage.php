@@ -6,15 +6,13 @@ if (!defined('ABSPATH')) {
 //Default Properties
 foreach ($args as $field => $content) $$field = $content;
 //Internal Fields
-foreach (get_field('hero_properties') as $key => $value) $$key = $value;
+foreach (fill_acf_group_defaults(get_field('hero_properties'), 'hero_properties') as $key => $value) $$key = $value;
 $cta_button = isset($hero_cta_button) && $hero_cta_button ? $hero_cta_button :   $hero_cta_button_default;
 
 //Hero pictures
-if (isset($hero_pictures)) foreach ($hero_pictures as $type => $picture) $$type = $picture;
-
-$bg_desktop = isset($background_desktop) && $background_desktop ? $background_desktop :  $hero_image_desktop_default;
-$bg_tablet = isset($background_tablet) && $background_tablet ? $background_tablet :  $hero_image_tablet_default;
-$bg_mobile = isset($background_mobile) && $background_mobile ? $background_mobile :  $hero_image_mobile_default;
+$bg_desktop = !empty($hero_pictures['background_desktop']) ? $hero_pictures['background_desktop'] :  $hero_image_desktop_default;
+$bg_tablet = !empty($hero_pictures['background_tablet']) ? $hero_pictures['background_tablet'] :  $hero_image_tablet_default;
+$bg_mobile = !empty($hero_pictures['background_mobile']) ? $hero_pictures['background_mobile'] :  $hero_image_mobile_default;
 
 if (!$bg_desktop) $bg_desktop = [];
 if (!$bg_tablet) $bg_tablet = [];
@@ -57,15 +55,15 @@ if (!$bg_mobile) $bg_mobile = [];
                 </div>
             </div>
 
-            <?php if (isset($badges) && $badges && !empty($badges)): ?>
+            <?php if (!empty($hero_pictures['badges'])): ?>
                 <div class="hero__badges">
-                    <?php foreach ($badges as $badge) {
-                        $pic = $badge['badge'];
+                    <?php foreach ($hero_pictures['badges'] as $badge) {
+                        $pic = $badge['badge'] ?? '';
                         img_print_picture_tag(img: $pic, classes: "hero__badge", is_priority: false, max_size: "medium", min_size: "thumbnail");
                     } ?>
                 </div>
             <?php endif ?>
         </div>
-        <?php if ($side_portrait) img_print_picture_tag(img: $side_portrait, max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true); ?>
+        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true); ?>
     </div>
 </section>

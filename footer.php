@@ -9,45 +9,45 @@
     <?php
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
+    $options = fill_acf_group_defaults($options, 'options', 'option');
     foreach ($options as $key => $value) $$key = $value;
     $phone_number = $contact_phone ?: $main_phone_number;
     ?>
 
     <?php
     if (!$form_section['hide_section'] && !get_field('hide_form_section')):
-      foreach ($form_section as $form_field => $form_content) $$form_field = $form_content;
     ?>
       <section class="contact-form-footer">
 
         <div class="contact-form-footer__wrapper">
-          <?php if ($background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "contact-form-footer__bg bg-image gradient-overlay"); ?>
+          <?php if (!empty($form_section['background_image'])) img_print_picture_tag(img: $form_section['background_image'], is_cover: true, classes: "contact-form-footer__bg bg-image gradient-overlay"); ?>
 
           <div class="contact-form-footer__inner container">
 
             <div class="contact-form shadow-box">
 
               <?php
-              print_title($contact_form_title, $contact_form_title_tag, "contact-form__title tx-center");
+              print_title($form_section['contact_form_title'] ?? '', $form_section['contact_form_title_tag'] ?? '', "contact-form__title tx-center");
               get_template_part('template-parts/ampersand', 'separator', array('classes' => 'contact-form__separator'));
               ?>
 
               <div class="contact-form__description formatted-text tx-center">
-                <?php echo wp_kses_post(wpautop($contact_form_description)); ?>
+                <?php echo wp_kses_post(wpautop($form_section['contact_form_description'] ?? '')); ?>
               </div>
 
               <div class="contact-form__form">
-                <?php render_gravity_form($contact_form, display_title: false, display_description: false); ?>
+                <?php render_gravity_form($form_section['contact_form'] ?? null, display_title: false, display_description: false); ?>
               </div>
 
-              <?php if ($message_before_submit && $message_before_submit !== ''): ?>
+              <?php if (!empty($form_section['message_before_submit'])): ?>
                 <div class="contact-form__message formatted-text tx-center flex-center">
-                  <?= $message_before_submit ?>
+                  <?= $form_section['message_before_submit'] ?>
                 </div>
               <?php endif; ?>
 
             </div>
 
-            <?php if ($side_picture) img_print_picture_tag(img: $side_picture, max_size: "large", min_size: "content",  classes: "contact-form-footer__side-pic shadow-box"); ?>
+            <?php if (!empty($form_section['side_picture'])) img_print_picture_tag(img: $form_section['side_picture'], max_size: "large", min_size: "content",  classes: "contact-form-footer__side-pic shadow-box"); ?>
           </div>
 
         </div>
@@ -58,7 +58,6 @@
 
     <?php
     if (!$locations_section['hide_section'] && !get_field('hide_locations_section')):
-      foreach ($locations_section as $form_field => $form_content) $$form_field = $form_content;
     ?>
 
       <section class="locations-footer bg-bicolor">
@@ -66,22 +65,22 @@
 
           <div class="locations-footer__content tx-center">
             <?php
-            print_title($locations_title, $locations_title_tag, "locations-footer__title");
+            print_title($locations_section['locations_title'] ?? '', $locations_section['locations_title_tag'] ?? '', "locations-footer__title");
             get_template_part('template-parts/ampersand', 'separator', array('classes' => 'locations-footer__separator'));
-            echo $locations_main_content;
+            echo $locations_section['locations_main_content'] ?? '';
             ?>
           </div>
 
           <div class="locations-cards">
 
-            <?php if (!$hide_first_card && isset($first_card) && $first_card['content']): ?>
+            <?php if (empty($locations_section['hide_first_card']) && !empty($locations_section['first_card']['content'])): ?>
 
               <div class="location-card location-card--first">
                 <div class="location-card__wrapper">
                   <div class="location-card__inner flex-center">
-                    <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
+                    <?php if (!empty($locations_section['first_card']['logo'])) img_print_picture_tag(img: $locations_section['first_card']['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                     <div class="location-card__content tx-center">
-                      <?= $first_card['content'] ?>
+                      <?= $locations_section['first_card']['content'] ?>
                     </div>
                   </div>
                 </div>
@@ -112,7 +111,7 @@
                     </div>
                     <?php
                         get_template_part('template-parts/splide', 'navigation', array(
-                          'nav_link' => $locations_page_link,
+                          'nav_link' => $locations_section['locations_page_link'] ?? null,
                           'classes' => 'locations-cards__arrows'
                         ));
                     ?>
@@ -135,7 +134,6 @@
 
     <?php
     if (!$copyright_section['hide_section'] && !get_field("hide_copyright_section")):
-      foreach ($copyright_section as $form_field => $form_content) $$form_field = $form_content;
     ?>
       <section class="copyright-footer">
         <div class="copyright-footer__wrapper container">
@@ -147,7 +145,7 @@
           <?php endif ?>
 
           <?php
-          $footer_links_menu = get_field("footer_links_menu") ?: $footer_links_menu;
+          $footer_links_menu = get_field("footer_links_menu") ?: ($copyright_section['footer_links_menu'] ?? null);
 
           if (isset($footer_links_menu) && $footer_links_menu && !get_field("hide_menu") && !empty($footer_links_menu)) {
             wp_nav_menu(
@@ -170,7 +168,7 @@
           </a>
 
           <p class="copyright-footer__advertisement tx-center">
-            <?= $copyright ?>
+            <?= $copyright_section['copyright'] ?? '' ?>
           </p>
 
         </div>
