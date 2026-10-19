@@ -505,3 +505,262 @@ window.addEventListener("load", () => {
     window.addEventListener("load", initVisibility, { once: true });
   }
 })();
+
+// Playback Video
+(function () {
+  // Close button label for the lightbox (site is EN/ES)
+  const closeVideoLabel = document.documentElement.lang
+    .toLowerCase()
+    .startsWith("es")
+    ? "Cerrar video"
+    : "Close video";
+
+  // ─── Source detection ────────────────────────────────────────────────────────
+
+  function isLocalVideo(videoId) {
+    if (!videoId) return false;
+    const homeURL = window.siteData?.homeURL;
+    if (homeURL && videoId.startsWith(`${homeURL}/wp-content/`)) return true;
+    try {
+      return (
+        new URL(videoId, window.location.href).hostname ===
+        window.location.hostname
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  // Returns the 11-character ID of a single YouTube video, or null for URLs that are not a video
+  // (channels, playlists, search results, the homepage...). Mirrors get_yt_code() in helpers.php
+  function extractYouTubeID(url) {
+    let value = String(url || "").trim();
+    if (!value) return null;
+    if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) value = "https://" + value.replace(/^\/+/, "");
+
+    let parsed;
+    try {
+      parsed = new URL(value);
+    } catch (e) {
+      return null;
+    }
+
+    const host = parsed.hostname.toLowerCase().replace(/^(www\.|m\.|music\.)/, "");
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    let id = null;
+
+    if (host === "youtu.be") {
+      id = segments[0];
+    } else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+      if (segments[0] === "watch") {
+        id = parsed.searchParams.get("v");
+      } else if (["embed", "shorts", "live", "v", "e"].includes(segments[0])) {
+        id = segments[1];
+      }
+    }
+
+    // "videoseries" is the 11-character placeholder used by playlist embeds, not a video
+    return id && id !== "videoseries" && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
+  }
+
+  function detectSource(trigger, rawValue) {
+    if (isLocalVideo(rawValue)) return "local";
+    if (trigger.classList.contains("ig-video")) return "instagram";
+    if (extractYouTubeID(rawValue)) return "youtube";
+    return "unknown";
+  }
+
+  // ─── Video ID resolution ─────────────────────────────────────────────────────
+  // Accepts both data-videourl (full URL) and data-videoid (direct ID or file URL)
+
+  function resolveVideoId(trigger, source) {
+    const raw = trigger.dataset.videourl || trigger.dataset.videoid || "";
+    if (source === "youtube") return extractYouTubeID(raw) || raw;
+    return raw;
+  }
+
+  // ─── Player builders ─────────────────────────────────────────────────────────
+
+  function buildIframe(attrs) {
+    const attrStr = Object.entries(attrs)
+      .map(([k, v]) => (v === true ? k : `${k}="${v}"`))
+      .join(" ");
+    return `<iframe ${attrStr}></iframe>`;
+  }
+
+  function buildPlayer(source, videoId, autoplay = false) {
+    switch (source) {
+      case "youtube":
+        return buildIframe({
+          src: `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&autoplay=${autoplay ? 1 : 0}`,
+          title: "YouTube video player",
+          frameborder: "0",
+          allow:
+            "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+          allowfullscreen: true,
+        });
+
+      case "instagram":
+        return buildIframe({
+          class: "instagram-media instagram-media-rendered",
+          src: `https://www.instagram.com/reel/${videoId}/embed/?cr=1&v=14&wp=1080`,
+          allowtransparency: "true",
+          allowfullscreen: true,
+          frameborder: "0",
+          scrolling: "no",
+          style: [
+            "background:white",
+            "max-width:540px",
+            "width:calc(100% - 2px)",
+            "border-radius:3px",
+            "border:1px solid rgb(219,219,219)",
+            "display:block",
+            "margin:0 0 12px",
+            "min-width:326px",
+            "padding:0",
+          ].join(";"),
+        });
+
+      case "local":
+        return `<video controls ${autoplay ? "autoplay" : ""} playsinline>
+                  <source src="${videoId}" type="video/mp4">
+                </video>`;
+
+      default:
+        console.warn("[VideoPlayer] Unrecognized video source:", videoId);
+        return "";
+    }
+  }
+
+  // ─── Lightbox mode ───────────────────────────────────────────────────────────
+
+  function openLightbox(source, videoId) {
+    if (document.getElementById("video-overlay")) return;
+
+    document.body.insertAdjacentHTML(
+      "afterbegin",
+      `<div id="video-overlay" class="${source === "instagram" ? "ig-video" : ""}" role="dialog" aria-modal="true">
+        <button class="overlay-close" aria-label="${closeVideoLabel}">✕</button>
+        <div class="video-container">
+          ${buildPlayer(source, videoId, true)}
+        </div>
+      </div>`,
+    );
+
+    const overlay = document.getElementById("video-overlay");
+    const container = overlay.querySelector(".video-container");
+    const iframe = overlay.querySelector("iframe");
+
+    overlay
+      .querySelector(".overlay-close")
+      .addEventListener("click", closeOverlay);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeOverlay();
+    });
+    document.addEventListener("keydown", handleKeydown);
+
+    // Trigger the transition: the overlay needs one rendered frame before the classes change
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        overlay.classList.add("active");
+        container.classList.add("active");
+
+        // Deferred autoplay: wait until the iframe has loaded
+        if (iframe && source === "youtube") {
+          iframe.addEventListener(
+            "load",
+            () => {
+              iframe.src = iframe.src.replace("autoplay=0", "autoplay=1");
+            },
+            { once: true },
+          );
+        }
+      }),
+    );
+  }
+
+  function closeOverlay() {
+    const overlay = document.getElementById("video-overlay");
+    if (!overlay) return;
+
+    const container = overlay.querySelector(".video-container");
+    const iframe = overlay.querySelector("iframe");
+    const video = overlay.querySelector("video");
+
+    if (iframe) iframe.src = "";
+    if (video) video.pause();
+
+    overlay.classList.remove("active");
+    container.classList.remove("active");
+    document.removeEventListener("keydown", handleKeydown);
+
+    setTimeout(() => overlay.remove(), 500);
+  }
+
+  function handleKeydown(e) {
+    if (e.key === "Escape") closeOverlay();
+  }
+
+  // ─── Inline mode ─────────────────────────────────────────────────────────────
+
+  function openInline(trigger, source, videoId) {
+    // Look for the target inside the trigger's own block first, so several video blocks on a page don't clash
+    const target = trigger.dataset.target;
+    const container = target
+      ? trigger.closest(".featured-video")?.querySelector(target) ||
+        document.querySelector(target)
+      : null;
+
+    if (!container) {
+      console.warn(
+        "[VideoPlayer] Inline container not found. Fallback to lightbox.",
+      );
+      openLightbox(source, videoId);
+      return;
+    }
+
+    const prevIframe = container.querySelector("iframe");
+    const prevVideo = container.querySelector("video");
+    if (prevIframe) prevIframe.src = "";
+    if (prevVideo) prevVideo.pause();
+
+    container.innerHTML = buildPlayer(source, videoId, true);
+    container.classList.add("active");
+    container.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+    // The play button was replaced by the player, so move focus to it instead of losing it
+    const player = container.querySelector("iframe, video");
+    if (player) player.focus({ preventScroll: true });
+  }
+
+  // ─── Init ────────────────────────────────────────────────────────────────────
+
+  function init() {
+    // Event delegation: covers static and dynamically added triggers (AJAX, Gutenberg, etc.)
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest("[data-videourl], [data-videoid]");
+      if (!trigger) return;
+
+      e.preventDefault();
+
+      const raw = (
+        trigger.dataset.videourl ||
+        trigger.dataset.videoid ||
+        ""
+      ).trim();
+      if (!raw) return;
+
+      const source = detectSource(trigger, raw);
+      const videoId = resolveVideoId(trigger, source);
+      const mode = trigger.dataset.mode || "lightbox";
+
+      mode === "inline"
+        ? openInline(trigger, source, videoId)
+        : openLightbox(source, videoId);
+    });
+  }
+
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", init)
+    : init();
+})();

@@ -656,3 +656,80 @@ iframe {
   height: 100%;
   border: 0;
 }
+
+/* Video Overlay - Lightbox
+--------------------------------------------------------------- */
+#video-overlay {
+  display: flex; /* always flex, so the transition is never interrupted */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(var(--primary-dark), 0);
+  opacity: 0;
+  transition:
+    background-color 0.5s ease-in-out,
+    opacity 0.5s ease-in-out;
+}
+
+#video-overlay.active {
+  display: flex;
+  background-color: rgba(var(--primary-dark), 0.85);
+  opacity: 1;
+}
+
+#video-overlay .video-container {
+  transform: scale(0);
+  transition: transform 0.6s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+#video-overlay .video-container.active {
+  width: 90%;
+  height: 300px;
+  transform: scale(1);
+}
+
+#video-overlay .video-container iframe,
+#video-overlay .video-container video {
+  width: 100%;
+  height: 100%;
+}
+
+/* Close button */
+#video-overlay .overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: rgb(var(--secondary-light));
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  z-index: 10001;
+  transition: color 0.3s ease-in-out;
+
+  &:hover,
+  &:focus-visible {
+    color: rgb(var(--tertiary-light));
+  }
+}
+
+@media (min-width: v.$tablet) {
+  #video-overlay .video-container.active {
+    width: 70%;
+    height: 350px;
+  }
+}
+
+@media (min-width: v.$mdpi) {
+  #video-overlay .video-container.active {
+    width: 50%;
+    height: 500px;
+  }
+}

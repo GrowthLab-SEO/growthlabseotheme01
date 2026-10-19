@@ -1,0 +1,23 @@
+{
+  "name": "acf/featured-video",
+  "title": "Featured Video",
+  "style": ["file:./block-min.css"],
+  "category": "growthlabseotheme01-blocks",
+  "icon": "block-default",
+  "keywords": ["growthlabseo", "video", "lazy loading", "lightbox", "youtube"],
+  "acf": {
+    "renderPreview": false,
+    "renderTemplate": "block.php"
+  },
+  "supports": {
+    "mode": true,
+    "customClassName": true,
+    "alignWide": true,
+    "spacing": {
+      "margin": true,
+      "padding": true,
+      "blockGap": ["horizontal", "vertical"]
+    }
+  },
+  "align": "full"
+}

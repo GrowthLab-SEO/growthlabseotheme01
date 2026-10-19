@@ -323,6 +323,9 @@ function growthlabseotheme01_scripts()
         true
     );
     wp_script_add_data('growthlabseotheme01-main-scripts', 'strategy', 'defer');
+    wp_localize_script('growthlabseotheme01-main-scripts', 'siteData', [
+        'homeURL' => home_url(),
+    ]);
 
     // Styled select fields.
     wp_enqueue_script(

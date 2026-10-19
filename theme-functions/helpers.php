@@ -326,6 +326,47 @@ if (!function_exists('get_yt_code')) {
     }
 }
 
+// Returns the best available thumbnail URL for a YouTube video, from $size downwards.
+// The result is cached in a transient, so YouTube is only queried once per video and size instead of on every page view.
+if (!function_exists('get_youtube_thumbnail')) {
+    function get_youtube_thumbnail(string $video_id, string $size = 'hqdefault'): string
+    {
+        $base = "https://img.youtube.com/vi/{$video_id}";
+        $cache_key = 'gl_yt_thumb_' . md5($video_id . '|' . $size);
+
+        $cached = get_transient($cache_key);
+        if (is_string($cached) && $cached !== '') return $cached;
+
+        $sizes = ['maxresdefault', 'sddefault', 'hqdefault', 'mqdefault', 'default'];
+
+        // Check from the requested size downwards
+        $start = array_search($size, $sizes, true);
+        $sizes = array_slice($sizes, $start !== false ? $start : 2);
+
+        foreach ($sizes as $s) {
+            $url = "{$base}/{$s}.jpg";
+            $response = wp_remote_head($url, array('timeout' => 3));
+
+            // YouTube is unreachable: stop instead of waiting for every remaining size
+            if (is_wp_error($response)) break;
+
+            if (wp_remote_retrieve_response_code($response) === 200) {
+                // YouTube returns a ~1.4 KB 120x90 placeholder for sizes that don't exist
+                $length = (int) wp_remote_retrieve_header($response, 'content-length');
+                if ($length > 2000) {
+                    set_transient($cache_key, $url, MONTH_IN_SECONDS);
+                    return $url;
+                }
+            }
+        }
+
+        // hqdefault always exists; cache this fallback for a shorter time so a temporary failure is retried later
+        $fallback = "{$base}/hqdefault.jpg";
+        set_transient($cache_key, $fallback, DAY_IN_SECONDS);
+        return $fallback;
+    }
+}
+
 // [phonenumber] shortcode: prints the main phone number from the site options as a tel: link.
 // All attributes are escaped because any user who can edit posts (including contributors) can use it.
 function phonenumber($atts, $content = null)
