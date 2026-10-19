@@ -160,27 +160,37 @@ function format_number_abbreviated($number)
     return $number;
 }
 
-// YouTube Video ID Extractor
-function get_yt_code($url = false)
-{
-    // Here is a sample of the URLs this regex matches: (there can be more content after the given URL that will be ignored)
+// Returns the 11-character ID of a single YouTube video, or false for any URL that is not a video
+// (channels, playlists, search results, the homepage, etc.). Mirrors extractYouTubeID() in main.js
+if (!function_exists('get_yt_code')) {
+    function get_yt_code($url = false)
+    {
+        if (!$url || !is_string($url)) return false;
 
-    // http://youtu.be/dQw4w9WgXcQ
-    // http://www.youtube.com/embed/dQw4w9WgXcQ
-    // http://www.youtube.com/watch?v=dQw4w9WgXcQ
-    // http://www.youtube.com/?v=dQw4w9WgXcQ
-    // http://www.youtube.com/v/dQw4w9WgXcQ
-    // http://www.youtube.com/e/dQw4w9WgXcQ
-    // http://www.youtube.com/user/username#p/u/11/dQw4w9WgXcQ
-    // http://www.youtube.com/sandalsResorts#p/c/54B8C800269D7C1B/0/dQw4w9WgXcQ
-    // http://www.youtube.com/watch?feature=player_embedded&v=dQw4w9WgXcQ
-    // http://www.youtube.com/?feature=player_embedded&v=dQw4w9WgXcQ
+        $url = trim($url);
+        if (!preg_match('#^[a-z][a-z0-9+.-]*://#i', $url)) $url = 'https://' . ltrim($url, '/');
 
-    // It also works on the youtube-nocookie.com URL with the same above options.
-    // It will also pull the ID from the URL in an embed code (both iframe and object tags)
-    if (! $url) return false;
-    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match);
-    return $match[1];
+        $parts = wp_parse_url($url);
+        if (empty($parts['host'])) return false;
+
+        $host = strtolower(preg_replace('/^(www\.|m\.|music\.)/i', '', $parts['host']));
+        $segments = array_values(array_filter(explode('/', $parts['path'] ?? '')));
+        $id = null;
+
+        if ($host === 'youtu.be') {
+            $id = $segments[0] ?? null;                                  // youtu.be/ID
+        } elseif (in_array($host, ['youtube.com', 'youtube-nocookie.com'], true)) {
+            if (($segments[0] ?? '') === 'watch') {
+                parse_str($parts['query'] ?? '', $query);                // youtube.com/watch?v=ID
+                $id = $query['v'] ?? null;
+            } elseif (in_array($segments[0] ?? '', ['embed', 'shorts', 'live', 'v', 'e'], true)) {
+                $id = $segments[1] ?? null;                              // /embed/ID, /shorts/ID, /live/ID
+            }
+        }
+
+        // "videoseries" is the 11-character placeholder used by playlist embeds, not a video
+        return is_string($id) && $id !== 'videoseries' && preg_match('/^[A-Za-z0-9_-]{11}$/', $id) ? $id : false;
+    }
 }
 
 // [phonenumber] shortcode: prints the main phone number from the site options as a tel: link.
