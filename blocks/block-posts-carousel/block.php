@@ -84,16 +84,14 @@ if (get_field('toggle_block')):
                             <?php
                             if (!empty($custom_items)) {
                                 foreach ($custom_items as $item) {
-                                    foreach ($item as $field => $data) $$field = $data;
-
                                     get_template_part('template-parts/default', 'card', array(
                                         "classes" => "splide__slide posts-carousel__card",
-                                        "picture" => $picture ?? '',
-                                        "title" => $title ?? '',
+                                        "picture" => $item['picture'] ?? '',
+                                        "title" => $item['title'] ?? '',
                                         "tag" => $posts_title_tag ?? "",
-                                        "content" => $content ?? '',
-                                        "link_url" => $link['url'] ?? '',
-                                        "link_target" => $link['target'] ?? '_self',
+                                        "content" => $item['content'] ?? '',
+                                        "link_url" => $item['link']['url'] ?? '',
+                                        "link_target" => $item['link']['target'] ?? '_self',
                                     ));
                                 }
                             } elseif ($query && $query->have_posts()) {

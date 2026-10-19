@@ -34,26 +34,24 @@ if (get_field('toggle_block')):
                 <?php
                 if (isset($faq_sections) && !empty($faq_sections)) :
                     foreach ($faq_sections as $section) :
-                        foreach ($section as $element => $content) $$element = $content;
                 ?>
 
                         <div class="faq__section">
                             <?php
-                            print_title($heading, $heading_tag, "faq__heading");
+                            print_title($section['heading'] ?? '', $section['heading_tag'] ?? 'p', "faq__heading");
                             ?>
 
                             <?php
-                            if (isset($faq_items) && !empty($faq_items)) :
-                                foreach ($faq_items as $item) :
-                                    foreach ($item as $item => $faq) $$item = $faq;
+                            if (!empty($section['faq_items'])) :
+                                foreach ($section['faq_items'] as $faq) :
                             ?>
                                     <div class="faq__item accordion">
                                         <div class="faq__question accordion__heading">
-                                            <?php print_title($question, $question_tag); ?>
+                                            <?php print_title($faq['question'] ?? '', $faq['question_tag'] ?? 'p'); ?>
                                         </div>
                                         <div class="faq__answer accordion__content">
                                             <div class="formatted-text accordion__inner">
-                                                <?= $answer ?>
+                                                <?= $faq['answer'] ?? '' ?>
                                             </div>
                                         </div>
                                     </div>

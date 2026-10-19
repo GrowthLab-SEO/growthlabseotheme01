@@ -64,16 +64,15 @@ if (get_field('toggle_block')):
                                         $i = 1;
                                         foreach ($items as $item) :
                                             if (!empty($item)):
-                                                foreach ($item as $field => $content) $$field = $content;
                                         ?>
                                                 <li class="trust-card splide__slide">
                                                     <div class="trust-card__wrapper">
                                                         <div class="trust-card__inner">
                                                             <span class="trust-card__number"><?= $i ?></span>
 
-                                                            <p class="trust-card__title"><?= $title ?></p>
+                                                            <p class="trust-card__title"><?= $item['title'] ?? '' ?></p>
 
-                                                            <p class="trust-card__content"><?= $content ?></p>
+                                                            <p class="trust-card__content"><?= $item['content'] ?? '' ?></p>
                                                         </div>
                                                     </div>
                                                 </li>
