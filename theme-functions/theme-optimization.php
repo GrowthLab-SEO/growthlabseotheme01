@@ -117,23 +117,19 @@ if (!is_admin()) {
 }
 
 /**
- * Preload all fonts (WARNING: This may hurt performance!)
+ * Preload the bundled font files of the fonts selected in the Customizer.
+ * Nothing is preloaded when other fonts (e.g. from the Font Library) are selected.
  */
 add_action('wp_head', function () {
-    $theme_uri = get_template_directory_uri();
+    if (!function_exists('theme_get_selected_default_font_faces')) return;
 
-    $fonts = array(
-        // Fraunces fonts
-        'fonts/fraunces-v38-latin/fraunces-v38-latin-regular.woff2',
-        'fonts/fraunces-v38-latin/fraunces-v38-latin-600.woff2',
-        // Open Sans fonts
-        'fonts/open-sans-v44-latin/open-sans-v44-latin-regular.woff2',
-        'fonts/open-sans-v44-latin/open-sans-v44-latin-600.woff2',
-        'fonts/open-sans-v44-latin/open-sans-v44-latin-700.woff2',
-    );
+    $base = get_template_directory_uri() . '/fonts/';
 
-    foreach ($fonts as $font) {
-        echo '<link rel="preload" href="' . esc_url($theme_uri . '/' . $font) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+    foreach (theme_get_selected_default_font_faces() as $faces) {
+        foreach ($faces as $face) {
+            if (empty($face['preload'])) continue;
+            echo '<link rel="preload" href="' . esc_url($base . $face['file']) . '" as="font" type="font/woff2" crossorigin>' . "\n";
+        }
     }
 }, 1);
 
