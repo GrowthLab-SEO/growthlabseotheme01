@@ -177,8 +177,12 @@ add_filter('the_content', function ($content) {
             $width = $width_match[1] ?? '100%';
             $height = $height_match[1] ?? '450';
 
+            // Append px only to purely numeric values; keep other units (e.g. 100%) as they are
+            $width = is_numeric($width) ? $width . 'px' : $width;
+            $height = is_numeric($height) ? $height . 'px' : $height;
+
             return sprintf(
-                '<div id="%s" class="gmap-lazy" data-src="%s" style="width:%spx;height:%spx;"></div>',
+                '<div id="%s" class="gmap-lazy" data-src="%s" style="width:%s;height:%s;"></div>',
                 $map_id,
                 esc_attr($src),
                 esc_attr($width),
