@@ -125,15 +125,15 @@ if (get_field('toggle_block')):
                         while ($query->have_posts()) {
                             $query->the_post();
 
-                            if (!empty(get_fields(get_the_ID()))) foreach (get_fields(get_the_ID()) as $field => $content) $$field = $content;
+                            $post_fields = get_fields(get_the_ID()) ?: [];
 
                             switch ($grid_type) {
                                 case 'case-result':
                                     get_template_part('template-parts/result', 'card', array(
                                         "classes" => "posts-grid__card " . $grid_type,
-                                        "numerical_amount" => $numerical_amount,
-                                        "case_title" => $case_title,
-                                        "case_description" => $case_description,
+                                        "numerical_amount" => ($post_fields['numerical_amount'] ?? ''),
+                                        "case_title" => ($post_fields['case_title'] ?? ''),
+                                        "case_description" => ($post_fields['case_description'] ?? ''),
                                     ));
                                     break;
 
@@ -143,7 +143,7 @@ if (get_field('toggle_block')):
                                         "picture" => get_the_post_thumbnail_url(),
                                         "title" => get_the_title(),
                                         "tag" => $posts_title_tag ?? "",
-                                        "content" => $role,
+                                        "content" => ($post_fields['role'] ?? ''),
                                         "link_url" => get_the_permalink(),
                                         "link_target" => '_self',
                                     ));
@@ -165,12 +165,12 @@ if (get_field('toggle_block')):
                                 case 'testimonial':
                                     get_template_part('template-parts/testimonial', 'card', array(
                                         "classes" => "posts-grid__card " . $grid_type,
-                                        "picture" => $author_picture,
-                                        "author" => $author_name,
-                                        "role" => $author_role,
-                                        "content" => $testimonial_content,
-                                        "source" => $testimonial_source,
-                                        "link_url" => $testimonial_source_link,
+                                        "picture" => ($post_fields['author_picture'] ?? ''),
+                                        "author" => ($post_fields['author_name'] ?? ''),
+                                        "role" => ($post_fields['author_role'] ?? ''),
+                                        "content" => ($post_fields['testimonial_content'] ?? ''),
+                                        "source" => ($post_fields['testimonial_source'] ?? ''),
+                                        "link_url" => ($post_fields['testimonial_source_link'] ?? ''),
                                         "condition" => isset($hide_testimonial_text) ? $hide_testimonial_text : false
                                     ));
                                     break;
