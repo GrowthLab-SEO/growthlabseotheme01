@@ -30,9 +30,16 @@ if (!window.loadSplide) {
       return;
     }
     window.__splideLoading = true;
-    window.__splideCallbacks = [callback];
+    // Keep callbacks left pending by a failed attempt so they run once Splide loads
+    window.__splideCallbacks = window.__splideCallbacks || [];
+    window.__splideCallbacks.push(callback);
+    // On failure, reset the loading flag so a later call can retry
+    const fail = (message) => {
+      console.error(message);
+      window.__splideLoading = false;
+    };
     if (!window.splideData || !window.splideData.url) {
-      console.error("Splide data not available");
+      fail("Splide data not available");
       return;
     }
     const script = document.createElement("script");
@@ -48,13 +55,14 @@ if (!window.loadSplide) {
           // Retry up to 10 times
           setTimeout(() => checkSplide(attempts + 1), 100); // Check every 100ms
         } else {
-          console.error("Splide failed to load after retries");
+          fail("Splide failed to load after retries");
         }
       };
       checkSplide();
     };
     script.onerror = () => {
-      console.error("Failed to load Splide script");
+      script.remove();
+      fail("Failed to load Splide script");
     };
     document.head.appendChild(script);
   };
