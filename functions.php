@@ -215,6 +215,39 @@ add_filter('excerpt_more', 'wpdocs_excerpt_more');
  * @return void
  */
 
+/**
+ * Whether the current request renders something that uses Splide: a carousel block in the current post, or the
+ * footer locations carousel (same conditions as footer.php: section visible and more than one office).
+ *
+ * @return bool
+ */
+function growthlabseotheme01_request_uses_splide()
+{
+    $splide_blocks = array(
+        'acf/office-locations',
+        'acf/logos-carousel',
+        'acf/posts-carousel',
+        'acf/selling-points',
+        'acf/trust-cards',
+    );
+
+    foreach (get_current_post_blocks(true) as $block) {
+        if (in_array($block['blockName'], $splide_blocks, true)) {
+            return true;
+        }
+    }
+
+    $es = filterContentByLanguage() ? '_es' : '';
+    $options = get_field_options('options' . $es);
+    $options = fill_acf_group_defaults($options, 'options', 'option');
+    $locations_section = $options['locations_section'] ?? array();
+
+    return empty($locations_section['hide_section'])
+        && !get_field('hide_locations_section')
+        && !empty($options['offices'])
+        && count($options['offices']) > 1;
+}
+
 function inline_main_critical_css()
 {
     global $block_critical_css;
@@ -240,7 +273,7 @@ function inline_main_critical_css()
 
     // Add Splide critical CSS only when carousels are present
     $splide_css_file = get_template_directory() . '/styles/vendor/splide/splide-core.min.css';
-    if (file_exists($splide_css_file)) {
+    if (growthlabseotheme01_request_uses_splide() && file_exists($splide_css_file)) {
         $critical_css .= "\n/* Splide Critical CSS */\n" . file_get_contents($splide_css_file);
     }
 
