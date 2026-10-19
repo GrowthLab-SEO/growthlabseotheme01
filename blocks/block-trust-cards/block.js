@@ -37,28 +37,32 @@ if (!window.loadSplide) {
 }
 
 (() => {
-  if (document.querySelector(".trust-cards__carousel")) {
+  // Initialize every block instance on the page, not only the first one
+  const carousels = document.querySelectorAll(".trust-cards__carousel .splide");
+  if (carousels.length) {
     loadSplide(() => {
-      var trustCardsCarousel = new Splide(".trust-cards__carousel .splide", {
-        type: "loop",
-        perPage: 1,
-        perMove: 1,
-        arrows: true,
-        pagination: false,
-        accessibility: true,
-        slideFocus: false,
-        mediaQuery: "min",
-        breakpoints: {
-          [tablet]: {
-            perPage: 3,
+      carousels.forEach((element) => {
+        var trustCardsCarousel = new Splide(element, {
+          type: "loop",
+          perPage: 1,
+          perMove: 1,
+          arrows: true,
+          pagination: false,
+          accessibility: true,
+          slideFocus: false,
+          mediaQuery: "min",
+          breakpoints: {
+            [tablet]: {
+              perPage: 3,
+            },
+            [ldpi]: {
+              destroy: true,
+              arrows: false,
+            },
           },
-          [ldpi]: {
-            destroy: true,
-            arrows: false,
-          },
-        },
+        });
+        trustCardsCarousel.mount();
       });
-      trustCardsCarousel.mount();
     });
   }
 })();

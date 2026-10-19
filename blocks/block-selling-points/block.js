@@ -37,11 +37,14 @@ if (!window.loadSplide) {
 }
 
 (() => {
-  if (document.querySelector(".selling-points__carousel")) {
+  // Initialize every block instance on the page, not only the first one
+  const carousels = document.querySelectorAll(
+    ".selling-points__carousel .splide",
+  );
+  if (carousels.length) {
     loadSplide(() => {
-      var sellingPointsCarousel = new Splide(
-        ".selling-points__carousel .splide",
-        {
+      carousels.forEach((element) => {
+        var sellingPointsCarousel = new Splide(element, {
           type: "loop",
           perPage: 1,
           perMove: 1,
@@ -59,9 +62,9 @@ if (!window.loadSplide) {
               arrows: false,
             },
           },
-        },
-      );
-      sellingPointsCarousel.mount();
+        });
+        sellingPointsCarousel.mount();
+      });
     });
   }
 })();
