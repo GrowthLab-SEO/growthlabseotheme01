@@ -5,13 +5,18 @@ if (!defined('ABSPATH')) {
 
 if (get_field('toggle_block')):
     foreach (get_block_fields($block) as $key => $value) $$key = $value;
+
+    // Accept hex colors, or rgba() since the color picker has opacity enabled
+    $raw_background_color = trim((string) ($background_color ?? ''));
+    $background_color = sanitize_hex_color($raw_background_color)
+        ?: (preg_match('/^rgba?\(\s*[\d.\s,%]+\)$/i', $raw_background_color) ? $raw_background_color : '');
 ?>
 
     <section<?= get_block_id_attribute($block_id ?? '') ?>
-        class="block logos-carousel <?php if (!$background_color) echo 'bg-bicolor'; ?>"
+        class="block logos-carousel<?php if (!$background_color) echo ' bg-bicolor'; ?>"
         <?php
         echo get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '');
-        if ($background_color) "style='background-color: $background_color'";
+        if ($background_color) echo ' style="' . esc_attr('background-color: ' . $background_color . ';') . '"';
         ?>>
 
         <div class="logos-carousel__wrapper container tx-center">
