@@ -280,15 +280,6 @@ if (!function_exists('render_gravity_form')) {
     }
 }
 
-//Debug helper
-function dd($data)
-{
-    echo '<pre>';
-    var_dump($data);
-    echo '</pre>';
-    die();
-}
-
 //Format Numerical Amount
 function format_number_abbreviated($number)
 {

@@ -392,11 +392,9 @@ function lazyLoadBgBicolor() {
   function loadCarouselMaps(splideEl) {
     // Check and add in one step
     if (loadedCarousels.has(splideEl)) {
-      //console.log("Carousel already loaded, skipping");
       return;
     }
 
-    //console.log("Loading carousel maps for the first time");
     loadedCarousels.add(splideEl);
 
     const checkSplide = setInterval(() => {
