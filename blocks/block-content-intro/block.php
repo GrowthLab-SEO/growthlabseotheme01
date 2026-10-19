@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 if (get_field('toggle_block')):
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
-    foreach (get_fields() as $key => $value) $$key = $value;
+    foreach (get_block_fields($block) as $key => $value) $$key = $value;
     if (isset($featured_image) && is_array($featured_image)) $featured_image['position'] = get_valid_field_choice('featured_image.position', $featured_image['position'] ?? '');
 ?>
 
