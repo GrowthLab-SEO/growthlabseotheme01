@@ -77,8 +77,10 @@ if (!function_exists('growthlabseotheme01_setup')) {
 
         add_theme_support('custom-logo', $defaults);
 
-        // Disable hard cropping for all image sizes
-        update_option('thumbnail_crop', 0);
+        // Disable hard cropping for all image sizes (only write when the stored value differs)
+        if ((int) get_option('thumbnail_crop') !== 0) {
+            update_option('thumbnail_crop', 0);
+        }
 
 
         //Remove Sizes from default WordPress Image Sizes
