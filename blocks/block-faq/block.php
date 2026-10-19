@@ -7,8 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
-        id="<?= $block_id ?? "" ?>"
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block faq <?php if (!$background_image) echo "bg-bicolor"; ?>"
         <?php if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'"; ?>>
 
@@ -73,8 +72,8 @@ if (get_field('toggle_block')):
 
             <?php if ($cta_link): ?>
                 <div class="faq__btn">
-                    <a href="<?= $cta_link['url'] ?>" target="<?= $cta_link['target'] ?>" class="btn btn--secondary">
-                        <span><?= $cta_link['title'] ?></span>
+                    <a href="<?= esc_url($cta_link['url']) ?>" target="<?= esc_attr($cta_link['target']) ?>" class="btn btn--secondary">
+                        <span><?= esc_html($cta_link['title']) ?></span>
                     </a>
                 </div>
             <?php endif ?>

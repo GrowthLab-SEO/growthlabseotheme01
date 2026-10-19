@@ -7,8 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
-        id="<?= $block_id ?? "" ?>"
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block trust-cards <?php if (!$background_image) echo "bg-bicolor"; ?>"
         <?php if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'"; ?>>
 

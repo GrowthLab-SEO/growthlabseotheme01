@@ -7,8 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
-        id="<?= $block_id ?? "" ?>"
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block contact-form 
         <?php
         if (isset($side_picture) && $side_picture && !$show_only_contact_form) {

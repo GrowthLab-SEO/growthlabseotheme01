@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
             <?php endif ?>
 
             <?php if ($location['google_map_url']): ?>
-                <a href="<?= $location['google_map_url'] ?>" class="location-card__cta" aria-label="<?= esc_attr( filterContentByLanguage() ? 'Obtener Direcciones' : 'Get Directions' ) ?>">
+                <a href="<?= esc_url($location['google_map_url']) ?>" class="location-card__cta" aria-label="<?= esc_attr( filterContentByLanguage() ? 'Obtener Direcciones' : 'Get Directions' ) ?>">
                     <?= filterContentByLanguage() ? "Obtener Direcciones" : "Get Directions" ?>
                 </a>
             <?php endif ?>

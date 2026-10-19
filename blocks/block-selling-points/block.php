@@ -7,8 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
-        id="<?= $block_id ?? "" ?>"
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block selling-points bg-bicolor"
         <?php
         if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'";
@@ -48,11 +47,12 @@ if (get_field('toggle_block')):
                                                     <?php img_print_picture_tag(img: $icon, classes: 'item-card__icon-img', max_size: "thumbnail") ?>
                                                 </div>
 
-                                                <<?= $title_tag ?> class="item-card__title">
-                                                    <?= isset($link) && $link ? "<a href='" . $link["url"] . "' target='" . $link["target"] . "' class='item-card__link'>" : "" ?>
-                                                    <?= $title ?>
-                                                    <?= isset($link) && $link ? "</a>" : "" ?>
-                                                </<?= $title_tag ?>>
+                                                <?php
+                                                $title_html = isset($link) && $link
+                                                    ? "<a href='" . esc_url($link["url"]) . "' target='" . esc_attr($link["target"]) . "' class='item-card__link'>" . $title . "</a>"
+                                                    : $title;
+                                                print_title($title_html, $title_tag, "item-card__title");
+                                                ?>
 
                                                 <?php if (isset($content) && $content): ?>
                                                     <p class="item-card__description"><?= $content ?></p>

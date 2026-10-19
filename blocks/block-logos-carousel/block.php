@@ -7,8 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
-        id="<?= $block_id ?? "" ?>"
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block logos-carousel <?php if (!$background_color) echo 'bg-bicolor'; ?>"
         <?php
         if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'";
@@ -44,7 +43,7 @@ if (get_field('toggle_block')):
 
 
                                             <?php if ($has_link): ?>
-                                                <span><?= $logo['link']['title'] ?></span>
+                                                <span><?= esc_html($logo['link']['title']) ?></span>
                                             </a>
                                         <?php endif; ?>
                                     </div>
