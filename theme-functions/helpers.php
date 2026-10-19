@@ -129,6 +129,49 @@ if (!function_exists('get_block_extract_attribute')) {
     }
 }
 
+// Returns the blocks of the current singular post, parsed only once per request. With $flatten = true the inner
+// blocks are included in a single flat list (parents before their children). Falls back to the queried object
+// when the global post has no blocks. Returns [] on non-singular requests or posts without blocks.
+if (!function_exists('get_current_post_blocks')) {
+    function get_current_post_blocks($flatten = false)
+    {
+        static $cache = [];
+
+        if (!is_singular()) return [];
+
+        global $post;
+        $current = $post;
+
+        if (empty($current->post_content) || strpos($current->post_content, '<!-- wp:') === false) {
+            $queried = get_queried_object();
+            if ($queried instanceof WP_Post && !empty($queried->post_content)) {
+                $current = $queried;
+            }
+        }
+
+        if (empty($current->post_content) || strpos($current->post_content, '<!-- wp:') === false) return [];
+
+        if (!isset($cache[$current->ID])) {
+            $tree = parse_blocks($current->post_content);
+            $flat = [];
+
+            $walk = function ($blocks) use (&$walk, &$flat) {
+                foreach ($blocks as $block) {
+                    $flat[] = $block;
+                    if (!empty($block['innerBlocks'])) {
+                        $walk($block['innerBlocks']);
+                    }
+                }
+            };
+            $walk($tree);
+
+            $cache[$current->ID] = ['tree' => $tree, 'flat' => $flat];
+        }
+
+        return $flatten ? $cache[$current->ID]['flat'] : $cache[$current->ID]['tree'];
+    }
+}
+
 // Numbers the posts grids rendered in the current request and returns the query arg each one paginates with.
 // The first grid returns '' and keeps using WordPress' paged/page var, so existing URLs keep working; every
 // additional grid gets its own arg (grid-2-page, grid-3-page...) so paginating one grid doesn't paginate the others.
