@@ -7,7 +7,7 @@ if (get_field('toggle_block')):
     foreach (get_fields() as $key => $value) $$key = $value;
 ?>
 
-    <section
+    <section<?= get_block_id_attribute($block_id ?? '') ?>
         class="block locations bg-bicolor"
         <?php if (isset($extract_block_from_content) && $extract_block_from_content) echo "data-extract='$place'"; ?>>
 
@@ -44,9 +44,9 @@ if (get_field('toggle_block')):
                 if ($show_all_locations) {
                     $es = filterContentByLanguage() ? '_es' : '';
                     $options = get_field_options('options' . $es);
-                    $locations = $options['offices'];
+                    $locations = !empty($options['offices']) ? $options['offices'] : [];
                 } else {
-                    $locations = $offices;
+                    $locations = !empty($offices) ? $offices : [];
                 }
                 if (!empty($locations)):
                 ?>
@@ -89,7 +89,7 @@ if (get_field('toggle_block')):
                                 </div>
                                 <?php
                                         get_template_part('template-parts/splide', 'navigation', array(
-                                            'nav_link' => $cta_link,
+                                            'nav_link' => $cta_link ?? '',
                                             'classes' => 'locations-cards__arrows'
                                         ));
                                 ?>
@@ -102,9 +102,9 @@ if (get_field('toggle_block')):
                 endif;
                 ?>
 
-                <?php if ($cta_link && count($locations) === 1): ?>
-                    <a href="<?= $cta_link['url'] ?>" target="<?= $cta_link['target'] ?>" class="cta-btn btn btn--secondary">
-                        <span><?= $cta_link['title'] ?></span>
+                <?php if (!empty($cta_link['url']) && count($locations) === 1): ?>
+                    <a href="<?= esc_url($cta_link['url']) ?>" target="<?= esc_attr($cta_link['target']) ?>" class="cta-btn btn btn--secondary">
+                        <span><?= esc_html($cta_link['title']) ?></span>
                     </a>
                 <?php endif; ?>
 
