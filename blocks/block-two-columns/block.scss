@@ -1,0 +1,135 @@
+@use "../../styles/globals/variables" as v;
+@use "../../styles/globals/mixins" as m;
+
+.two-columns {
+  position: relative;
+  z-index: 5;
+  padding: var(--sp-md) 0;
+  background-color: rgb(var(--primary));
+
+  @media (min-width: v.$ldpi) {
+    padding: var(--sp-lg) 0;
+  }
+
+  $parent: &;
+
+  &.light {
+    background-color: rgb(var(--secondary));
+
+    #{$parent}__title {
+      color: rgb(var(--primary));
+    }
+
+    #{$parent}__content *:not(.btn, .btn *, a) {
+      color: rgb(var(--primary));
+    }
+  }
+
+  &__separator {
+    position: relative;
+    z-index: 5;
+    margin-bottom: var(--sp-md);
+  }
+
+  &__wrapper {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+
+    @media (min-width: v.$ldpi) {
+      display: grid;
+      grid-template-columns: 52% 45%;
+      grid-auto-flow: row dense;
+      justify-content: space-between;
+      align-items: center;
+      row-gap: var(--sp-sm);
+
+      &.reverse {
+        grid-template-columns: 45% 52%;
+
+        #{$parent}__col {
+          grid-column: 2/3;
+
+          &--image {
+            grid-column: 1/2;
+          }
+        }
+      }
+    }
+  }
+
+  &__title {
+    margin-bottom: 0;
+    @include m.title(rgb(var(--secondary-light)), 2.8rem, 3.3vw, 4.2rem);
+
+    @media (min-width: v.$ldpi) {
+      grid-column: 1/3;
+    }
+  }
+
+  &__col {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: v.$ldpi) {
+      grid-column: 1/2;
+
+      &--image {
+        grid-column: 2/3;
+      }
+    }
+  }
+
+  // A single column takes the full width
+  @media (min-width: v.$ldpi) {
+    &__wrapper:not(:has(#{$parent}__col--image)) #{$parent}__col,
+    &__wrapper:not(:has(#{$parent}__col:not(#{$parent}__col--image)))
+      #{$parent}__col--image {
+      grid-column: 1/3;
+    }
+  }
+
+  &__content {
+    *:not(.btn, .btn *, a) {
+      color: rgb(var(--secondary));
+    }
+
+    a:not(.btn) {
+      color: rgb(var(--tertiary));
+
+      &:hover {
+        color: rgb(var(--tertiary-light));
+      }
+    }
+
+    > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__btn {
+    margin-top: var(--sp-xsm);
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    box-shadow: 8px 8px 0px rgb(var(--tertiary));
+
+    &.reverse {
+      box-shadow: -8px 8px 0px rgb(var(--tertiary));
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center center;
+    }
+  }
+}
