@@ -52,6 +52,9 @@ if (!function_exists('growthlabseotheme01_setup')) {
 
     function growthlabseotheme01_setup()
     {
+        // Load the theme translations from the languages folder
+        load_theme_textdomain('growthlabseotheme01', get_template_directory() . '/languages');
+
         /*
 		* Let WordPress manage the document title.
 		* This theme does not use a hard-coded <title> tag in the document head,
