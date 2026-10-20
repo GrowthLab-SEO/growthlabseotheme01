@@ -13,6 +13,11 @@ $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options
 
 $args["link_target"] = ($args["link_target"] ?? "") ?: "_self";
 $link_rel = $args["link_target"] === "_blank" ? ' rel="noopener noreferrer"' : '';
+$read_more_label = sprintf(
+    /* translators: %s: post title */
+    get_bilingual_text(__('Read more about %s', 'growthlabseotheme01'), 'Leer más sobre %s'),
+    wp_strip_all_tags($args['title'] ?? '')
+);
 ?>
 
 <div class="default-card <?= esc_attr($args["classes"] ?? '') ?>">
@@ -46,8 +51,8 @@ $link_rel = $args["link_target"] === "_blank" ? ' rel="noopener noreferrer"' : '
 
             <?php if ($args['link_url'] && $args['link_url'] !== ''): ?>
                 <div class="default-card__btn">
-                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>"<?= $link_rel ?> class="btn btn--secondary" aria-label="Read More">
-                        <span>Read More</span>
+                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>"<?= $link_rel ?> class="btn btn--secondary" aria-label="<?= esc_attr($read_more_label) ?>">
+                        <span><?= esc_html(get_bilingual_text(__('Read More', 'growthlabseotheme01'), 'Leer más')) ?></span>
                     </a>
                 </div>
             <?php endif ?>

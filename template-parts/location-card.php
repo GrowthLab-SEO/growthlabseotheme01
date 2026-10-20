@@ -51,9 +51,11 @@ if (!defined('ABSPATH')) {
                 </a>
             <?php endif ?>
 
-            <?php if ($location['google_map_url']): ?>
-                <a href="<?= esc_url($location['google_map_url']) ?>" class="location-card__cta" aria-label="<?= esc_attr( filterContentByLanguage() ? 'Obtener Direcciones' : 'Get Directions' ) ?>">
-                    <?= filterContentByLanguage() ? "Obtener Direcciones" : "Get Directions" ?>
+            <?php if ($location['google_map_url']):
+                $directions_label = get_bilingual_text(__('Get Directions', 'growthlabseotheme01'), 'Cómo llegar');
+            ?>
+                <a href="<?= esc_url($location['google_map_url']) ?>" class="location-card__cta" aria-label="<?= esc_attr($directions_label) ?>">
+                    <?= esc_html($directions_label) ?>
                 </a>
             <?php endif ?>
 

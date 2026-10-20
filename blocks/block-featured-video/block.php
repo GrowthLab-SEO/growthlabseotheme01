@@ -45,7 +45,7 @@ if (get_field('toggle_block')):
                     ?>
                     data-mode="<?= !empty($enable_lightbox) ? 'lightbox' : 'inline' ?>"
                     data-target=".featured-video__wrapper">
-                    <span><?php esc_html_e('Play', 'growthlabseotheme01'); ?></span>
+                    <span><?= esc_html(get_bilingual_text(__('Play', 'growthlabseotheme01'), 'Reproducir')) ?></span>
                 </button>
             <?php
             endif;

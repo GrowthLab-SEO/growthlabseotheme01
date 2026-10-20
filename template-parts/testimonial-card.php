@@ -2,6 +2,11 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+$read_more_label = sprintf(
+    /* translators: %s: testimonial author */
+    get_bilingual_text(__('Read the full review by %s', 'growthlabseotheme01'), 'Leer la reseña completa de %s'),
+    wp_strip_all_tags($args['author'] ?? '')
+);
 ?>
 
 <div class="testimonial-card <?= esc_attr($args["classes"] ?? "") ?>">
@@ -47,7 +52,7 @@ if (!defined('ABSPATH')) {
                         <?= '"' . wp_kses_post($args["content"]) . '"' ?>
 
                         <?php if ($args['link_url']): ?>
-                            <a href="<?= esc_url($args['link_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="Read More">Read More</a>
+                            <a href="<?= esc_url($args['link_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="<?= esc_attr($read_more_label) ?>"><?= esc_html(get_bilingual_text(__('Read More', 'growthlabseotheme01'), 'Leer más')) ?></a>
                         <?php endif ?>
                     </p>
                 </blockquote>

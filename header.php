@@ -53,7 +53,7 @@ if (!defined('ABSPATH')) {
                         img_print_picture_tag(img: $image, max_size: "medium", min_size: "medium", alt_text: get_bloginfo('name'), is_priority: true, classes: "site-logo__pic");
                     }
                     ?>
-                    <span>Site Logo</span>
+                    <span><?= esc_html(get_bilingual_text(__('Site Logo', 'growthlabseotheme01'), 'Logotipo del sitio')) ?></span>
                 </a>
             </div>
 
@@ -86,13 +86,13 @@ if (!defined('ABSPATH')) {
             ?>
 
                 <div class="site-header__navigation">
-                    <button class="mobile-menu-button" role="button" aria-label="Mobile Menu Button">
+                    <button class="mobile-menu-button" role="button" aria-label="<?= esc_attr(get_bilingual_text(__('Mobile Menu Button', 'growthlabseotheme01'), 'Botón del menú móvil')) ?>">
                         <svg viewBox="0 0 24 24" width="24" height="24">
                             <line x1="2" y1="4" x2="22" y2="4" />
                             <line x1="2" y1="12" x2="22" y2="12" />
                             <line x1="2" y1="20" x2="22" y2="20" />
                         </svg>
-                        <span>Mobile Menu Button</span>
+                        <span><?= esc_html(get_bilingual_text(__('Mobile Menu Button', 'growthlabseotheme01'), 'Botón del menú móvil')) ?></span>
                     </button>
 
                     <?php wp_nav_menu($menu_args); ?>
