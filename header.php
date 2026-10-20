@@ -28,7 +28,8 @@ if (!defined('ABSPATH')) {
     $options = fill_acf_group_defaults($options, 'options', 'option');
     foreach ($options as $key => $value) $$key = $value;
 
-    $logo_link = esc_url(home_url('/' . $es));
+    // $es is an options suffix, not a path: Spanish pages live under /es/ (see filterContentByLanguage())
+    $logo_link = esc_url(home_url($es ? '/es/' : '/'));
     $phone_number = $contact_phone ?: $main_phone_number;
 
     if (get_field('custom_header', $post_id)) {
