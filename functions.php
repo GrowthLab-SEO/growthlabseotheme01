@@ -373,6 +373,11 @@ function growthlabseotheme01_scripts()
     wp_script_add_data('growthlabseotheme01-main-scripts', 'strategy', 'defer');
     wp_localize_script('growthlabseotheme01-main-scripts', 'siteData', [
         'homeURL' => home_url(),
+        // Printed inside HTML attributes by main.js
+        'i18n' => [
+            'closeVideo'  => esc_attr(get_bilingual_text(__('Close video', 'growthlabseotheme01'), 'Cerrar video')),
+            'videoDialog' => esc_attr(get_bilingual_text(__('Video player', 'growthlabseotheme01'), 'Reproductor de video')),
+        ],
     ]);
 
     // Styled select fields.

@@ -103,13 +103,28 @@ function eventListeners() {
   if (document.querySelector(".site-header--sticky"))
     window.addEventListener("scroll", fadeInHeader);
 
-  if (accordionItems) {
-    accordionItems.forEach((item) => {
-      const heading = item.querySelector(".accordion__heading");
-      heading.setAttribute("aria-expanded", item.classList.contains("open") ? "true" : "false");
-      heading.addEventListener("click", toggleAccordion);
-    });
-  }
+  accordionItems.forEach((item) => {
+    const heading = item.querySelector(".accordion__heading");
+    if (!heading) return;
+    heading.setAttribute("aria-expanded", item.classList.contains("open") ? "true" : "false");
+    heading.addEventListener("click", toggleAccordion);
+  });
+
+  // Elements that act as buttons without being one (accordion headings, icon buttons) respond to Enter and Space
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const target = e.target;
+    if (!(target instanceof Element) || !target.matches('[role="button"]:not(button):not(a)')) return;
+    e.preventDefault();
+    target.click();
+  });
+
+  // Escape closes the mobile menu and gives the focus back to its button
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !mainMenu || !mainMenu.classList.contains("active")) return;
+    handleMenuClick();
+    mobileBtn && mobileBtn.focus();
+  });
 }
 
 function showMenus() {
@@ -126,6 +141,7 @@ function showMenus() {
   if (window.innerWidth > tablet) {
     mobileBtn.classList.remove("active");
     mainMenu.classList.remove("active");
+    mobileBtn.setAttribute("aria-expanded", "false");
 
     // remove listeners on desktop
     parentMenuItems.forEach((item) => {
@@ -135,6 +151,7 @@ function showMenus() {
   } else {
     // add listener on mobile (same reference, no wrapper)
     mobileBtn.addEventListener("click", handleMenuClick);
+    if (!mobileBtn.hasAttribute("aria-expanded")) mobileBtn.setAttribute("aria-expanded", "false");
 
     parentMenuItems.forEach((item) => {
       // ensure there are no duplicates
@@ -147,13 +164,15 @@ function showMenus() {
 // Function to handle menu item clicks
 function handleMenuClick() {
   removeSubmenuActiveClasses();
-  mainMenu.classList.toggle("active");
-  mobileBtn.classList.toggle("active");
+  const isOpen = mainMenu.classList.toggle("active");
+  mobileBtn.classList.toggle("active", isOpen);
+  mobileBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
 }
 
 // Function to handle submenu item clicks
 function handleSubMenuClick(e) {
-  if (e.target.tagName !== "A") {
+  // Links (and the spans inside them) navigate; anything else in the item toggles its submenu
+  if (!e.target.closest("a")) {
     e.stopPropagation();
     let currentItem = e.currentTarget;
     currentItem.classList.toggle("active");
@@ -215,26 +234,34 @@ function footerLocationsCarousel() {
 
 //Blocks
 function extractBlocks() {
+  if (!pageInner) return;
+
+  // Move the block nodes (copying their HTML would drop listeners and state already attached to them)
   blocksInContent.forEach((item) => {
-    if (item.getAttribute("data-extract") === "before") {
-      pageInner.insertAdjacentHTML("beforebegin", item.outerHTML);
-    } else {
-      pageInner.insertAdjacentHTML("afterend", item.outerHTML);
-    }
-    item.remove();
+    pageInner.insertAdjacentElement(
+      item.getAttribute("data-extract") === "before" ? "beforebegin" : "afterend",
+      item,
+    );
   });
 }
 
 //Find Blocks with Bg-BiColor class
 function findConsecutiveGroups() {
-  const blocks = document.querySelectorAll("body>.block");
+  // Top-level blocks, whether the template prints them in <body> or inside <main>
+  const blocks = document.querySelectorAll("body>.block, body>main>.block");
 
-  if (!blocks) return;
+  if (!blocks.length) return;
 
   const groups = [];
   let currentGroup = [];
 
   for (let i = 0; i < blocks.length; i++) {
+    // Blocks with different parents are not consecutive siblings
+    if (currentGroup.length && blocks[i].parentElement !== currentGroup[0].parentElement) {
+      if (currentGroup.length > 1) groups.push([...currentGroup]);
+      currentGroup = [];
+    }
+
     if (blocks[i].classList.contains("bg-bicolor")) {
       currentGroup.push(blocks[i]);
     } else {
@@ -457,12 +484,14 @@ function lazyLoadBgBicolor() {
 })();
 
 //Unwrap Elements
+// wpautop wraps media of the content in paragraphs; move them out. Only media that are direct children of paragraphs
+// in the main content are moved, so linked images keep their link and the header/footer are left alone.
 window.addEventListener("load", () => {
   const wrappedImages = document.querySelectorAll(
-    "p:has(img), p:has(picture), p:has(figure)",
+    "main p:has(> img, > picture, > figure)",
   );
   wrappedImages.forEach((paragraph) => {
-    const elementsToUnwrap = paragraph.querySelectorAll("img, picture, figure");
+    const elementsToUnwrap = paragraph.querySelectorAll(":scope > img, :scope > picture, :scope > figure");
     elementsToUnwrap.forEach((element) => {
       paragraph.insertAdjacentElement("beforebegin", element);
     });
@@ -508,12 +537,8 @@ window.addEventListener("load", () => {
 
 // Playback Video
 (function () {
-  // Close button label for the lightbox (site is EN/ES)
-  const closeVideoLabel = document.documentElement.lang
-    .toLowerCase()
-    .startsWith("es")
-    ? "Cerrar video"
-    : "Close video";
+  // Lightbox labels, in the language of the page (see siteData.i18n in functions.php)
+  const i18n = (window.siteData && window.siteData.i18n) || {};
 
   // ─── Source detection ────────────────────────────────────────────────────────
 
@@ -621,10 +646,12 @@ window.addEventListener("load", () => {
           ].join(";"),
         });
 
-      case "local":
+      case "local": {
+        const type = videoMimeType(videoId);
         return `<video controls ${autoplay ? "autoplay" : ""} playsinline>
-                  <source src="${videoId}" type="video/mp4">
+                  <source src="${videoId}"${type ? ` type="${type}"` : ""}>
                 </video>`;
+      }
 
       default:
         console.warn("[VideoPlayer] Unrecognized video source:", videoId);
@@ -632,32 +659,46 @@ window.addEventListener("load", () => {
     }
   }
 
+  // MIME type of a local video from its extension; unknown formats are left for the browser to sniff
+  function videoMimeType(url) {
+    const extension = (String(url).split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i) || [])[1];
+    const types = { mp4: "video/mp4", m4v: "video/mp4", webm: "video/webm", ogv: "video/ogg", ogg: "video/ogg", mov: "video/quicktime" };
+    return types[(extension || "").toLowerCase()] || "";
+  }
+
   // ─── Lightbox mode ───────────────────────────────────────────────────────────
 
+  let activeOverlay = null;
+  let focusBeforeOverlay = null;
+
   function openLightbox(source, videoId) {
-    if (document.getElementById("video-overlay")) return;
+    if (activeOverlay) return;
 
     document.body.insertAdjacentHTML(
       "afterbegin",
-      `<div id="video-overlay" class="${source === "instagram" ? "ig-video" : ""}" role="dialog" aria-modal="true">
-        <button class="overlay-close" aria-label="${closeVideoLabel}">✕</button>
+      `<div id="video-overlay" class="${source === "instagram" ? "ig-video" : ""}" role="dialog" aria-modal="true" aria-label="${i18n.videoDialog || "Video player"}">
+        <button class="overlay-close" aria-label="${i18n.closeVideo || "Close video"}">✕</button>
         <div class="video-container">
           ${buildPlayer(source, videoId, true)}
         </div>
       </div>`,
     );
 
-    const overlay = document.getElementById("video-overlay");
+    const overlay = document.body.firstElementChild;
     const container = overlay.querySelector(".video-container");
     const iframe = overlay.querySelector("iframe");
+    const closeButton = overlay.querySelector(".overlay-close");
+    activeOverlay = overlay;
 
-    overlay
-      .querySelector(".overlay-close")
-      .addEventListener("click", closeOverlay);
+    closeButton.addEventListener("click", closeOverlay);
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) closeOverlay();
     });
     document.addEventListener("keydown", handleKeydown);
+
+    // Move the focus into the dialog and give it back to the trigger on close
+    focusBeforeOverlay = document.activeElement;
+    closeButton.focus({ preventScroll: true });
 
     // Trigger the transition: the overlay needs one rendered frame before the classes change
     requestAnimationFrame(() =>
@@ -680,8 +721,9 @@ window.addEventListener("load", () => {
   }
 
   function closeOverlay() {
-    const overlay = document.getElementById("video-overlay");
+    const overlay = activeOverlay;
     if (!overlay) return;
+    activeOverlay = null;
 
     const container = overlay.querySelector(".video-container");
     const iframe = overlay.querySelector("iframe");
@@ -694,11 +736,38 @@ window.addEventListener("load", () => {
     container.classList.remove("active");
     document.removeEventListener("keydown", handleKeydown);
 
+    // The overlay fades out for 500ms: let clicks go through it meanwhile
+    overlay.style.pointerEvents = "none";
     setTimeout(() => overlay.remove(), 500);
+
+    if (focusBeforeOverlay && document.contains(focusBeforeOverlay)) {
+      focusBeforeOverlay.focus({ preventScroll: true });
+    }
+    focusBeforeOverlay = null;
   }
 
   function handleKeydown(e) {
-    if (e.key === "Escape") closeOverlay();
+    if (e.key === "Escape") {
+      closeOverlay();
+      return;
+    }
+
+    // Keep the keyboard focus inside the dialog
+    if (e.key === "Tab" && activeOverlay) {
+      const focusable = Array.from(activeOverlay.querySelectorAll("button, iframe, video"));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!activeOverlay.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   }
 
   // ─── Inline mode ─────────────────────────────────────────────────────────────
