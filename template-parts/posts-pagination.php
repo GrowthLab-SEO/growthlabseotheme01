@@ -44,9 +44,14 @@ if (!empty($args['page_arg'])) {
     // Keep the current path (including another grid's /page/N/) and paginate with the custom query arg.
     // paginate_links() re-adds the other current query args, so other grids keep their pages.
     $page_arg = sanitize_key($args['page_arg']);
-    $current_url = set_url_scheme('http://' . $_SERVER['HTTP_HOST'] . wp_unslash($_SERVER['REQUEST_URI']));
+    // Build the URL from home_url() instead of the Host header, so a forged host can't end up in the links
+    $request_path = wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+    $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH) ?: '/';
+    if (str_starts_with($request_path, $home_path)) {
+        $request_path = substr($request_path, strlen($home_path));
+    }
     $links_args = array(
-        'base' => explode('?', $current_url)[0] . '%_%',
+        'base' => home_url('/' . ltrim($request_path, '/')) . '%_%',
         'format' => '?' . $page_arg . '=%#%',
     );
 }
