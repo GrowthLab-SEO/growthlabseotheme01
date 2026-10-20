@@ -58,7 +58,7 @@ if (get_field('toggle_block')):
                                     <div class="splide__list">
                                     <?php endif; ?>
 
-                                    <?php if (isset($first_card) && $first_card['content'] && $locations_view_structure === "grid"): ?>
+                                    <?php if (!$hide_first_card && isset($first_card) && $first_card['content'] && $locations_view_structure === "grid"): ?>
                                         <div class="location-card location-card--first">
                                             <div class="location-card__wrapper">
                                                 <div class="location-card__inner flex-center">
