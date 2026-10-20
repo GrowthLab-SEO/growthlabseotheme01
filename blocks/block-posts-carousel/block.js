@@ -64,7 +64,7 @@ if (!window.loadSplide) {
             slideFocus: false,
             mediaQuery: "min",
             breakpoints: {
-              [tablet]: {
+              [window.themeBreakpoints?.tablet ?? 768]: {
                 perPage: splideElement.closest(".sidebar")
                   ? 1
                   : carouselType === "case-result" ||
@@ -73,7 +73,7 @@ if (!window.loadSplide) {
                     ? 2
                     : 3,
               },
-              [ldpi]: {
+              [window.themeBreakpoints?.ldpi ?? 1024]: {
                 perPage: splideElement.closest(".sidebar")
                   ? 1
                   : carouselType === "case-result"

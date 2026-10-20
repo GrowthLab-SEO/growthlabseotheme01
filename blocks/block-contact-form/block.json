@@ -1,5 +1,6 @@
 {
   "name": "acf/contact-form",
+  "textdomain": "growthlabseotheme01",
   "title": "Contact Form",
   "style": ["file:./block-min.css"],
   "category": "growthlabseotheme01-blocks",

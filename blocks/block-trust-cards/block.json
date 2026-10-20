@@ -1,8 +1,9 @@
 {
   "name": "acf/trust-cards",
+  "textdomain": "growthlabseotheme01",
   "title": "Trust Cards",
   "style": ["file:./block-min.css"],
-  "script": ["file:./block-min.js"],
+  "viewScript": ["file:./block-min.js"],
   "category": "growthlabseotheme01-blocks",
   "icon": "block-default",
   "keywords": ["growthlabseo", "cta", "content", "carousel", "trust", "cards"],

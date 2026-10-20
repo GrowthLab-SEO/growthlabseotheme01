@@ -78,11 +78,11 @@ if (!window.loadSplide) {
           slideFocus: false,
           mediaQuery: "min",
           breakpoints: {
-            [tablet]: {
+            [window.themeBreakpoints?.tablet ?? 768]: {
               perPage: effectiveTablet,
               perMove: effectiveTablet,
             },
-            [ldpi]: {
+            [window.themeBreakpoints?.ldpi ?? 1024]: {
               perPage: effectiveLdpi,
               perMove: effectiveLdpi,
             },
