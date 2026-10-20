@@ -175,7 +175,7 @@ growthlabseotheme01/
 │   ├── picture-optimization.php    Responsive <picture> generation with WebP and lazy loading
 │   ├── security-functions.php      Generator tag removal, XML-RPC off
 │   ├── svg-support.php             SVG uploads, sanitization, inline SVG output
-│   ├── theme-optimization.php      Head cleanup, emojis, dashicons, font preload, lazy maps
+│   ├── theme-optimization.php      Head cleanup, emojis, dashicons, delayed form scripts, lazy maps
 │   └── tiny-mce.php                Classic editor / ACF WYSIWYG toolbar, fonts, colors
 ├── functions.php        Includes, theme setup, theme.json filter, critical CSS, scripts, sidebars
 ├── header.php / footer.php         Site header + hero / footer form, locations and copyright sections
@@ -308,7 +308,8 @@ Other files:
 
 - `font_primary` and `font_secondary` are select controls. Choices are the bundled theme fonts (Open Sans, Fraunces) plus any font installed through the WordPress **Font Library** (listed first).
 - The selection becomes `--font-primary` / `--font-secondary` and the `primary` / `secondary` font families in `theme.json`.
-- **Bundled fonts are only loaded while selected.** `@font-face` rules for a bundled family are inlined, and its faces marked `preload` get `<link rel="preload">`, only when that family is the primary or secondary font. Selecting Font Library fonts loads no bundled files.
+- **Bundled fonts are only loaded while selected.** `@font-face` rules for a bundled family are inlined only when that family is the primary or secondary font. Selecting Font Library fonts loads no bundled files.
+- **Font preloads (header and hero only).** `theme_get_above_fold_font_variants()` in `theme-functions/fonts-selector.php` lists the role (primary/secondary), weight and style of the text the header and the hero render above the fold, measured on the theme's templates on desktop and mobile; variants can be limited to some hero styles (`hero_styles`) or viewports (`media`). `theme_print_font_preloads()` (priority 1 in `wp_head`) maps each variant to the file of the font selected in the Customizer, bundled or from the Font Library, picking the face the browser would use (nearest weight per the CSS rules, one file for variable fonts), with the same URL as its `@font-face` rule, and preloads at most 4 files in the list order (hero title first). Adjust them with the `theme_above_fold_font_variants` filter (an empty array disables them) and the limit with `theme_font_preload_limit`.
 - A `wp_theme_json_data_user` filter drops the copy of the theme font families that the Site Editor's font manager saves in global styles, which would otherwise make WordPress print every bundled font face. Font Library fonts are kept.
 - **Only the selected Font Library fonts are loaded on the front end.** `theme_print_selected_font_faces()` replaces WordPress' `wp_print_font_faces()` and prints `@font-face` rules only for the selected primary/secondary families (faces without a `font-display` get `swap`). The block editor still loads every installed font, so all of them can be previewed there.
 - **TinyMCE fonts are dynamic.** The classic editor / ACF WYSIWYG font menu (`_theme_get_tinymce_font_formats()` in `tiny-mce.php`) is built from the merged `theme.json` font families: the theme fonts (the Customizer selection), then the Font Library fonts, then Arial and Times New Roman.
@@ -316,7 +317,7 @@ Other files:
 To add a bundled font face:
 
 1. Put the `.woff2` files in `fonts/{family-folder}/`.
-2. Add the faces to `theme_get_default_font_faces()` in `theme-functions/fonts-selector.php`, keyed by family name: `['weight' => '400', 'style' => 'normal', 'file' => '{family-folder}/{file}.woff2', 'display' => 'swap', 'preload' => true]`. Preload only the weights used above the fold.
+2. Add the faces to `theme_get_default_font_faces()` in `theme-functions/fonts-selector.php`, keyed by family name: `['weight' => '400', 'style' => 'normal', 'file' => '{family-folder}/{file}.woff2', 'display' => 'swap']`. The faces to preload come from `theme_get_above_fold_font_variants()`, not from this list.
 3. For a new family, also add it to the base list in `theme_get_all_fonts()` so it appears as a Customizer choice. The TinyMCE font menu picks up the selected fonts automatically.
 
 ## Multilingual (English/Spanish)
@@ -367,7 +368,7 @@ Translations: `load_theme_textdomain('growthlabseotheme01', get_template_directo
 - **Styled select fields:** `js/styled-select-fields.js` replaces native single `<select>` elements (except `.posts-filters__select` and `multiple`) with an accessible custom dropdown, including selects added later (e.g. Gravity Forms AJAX).
 - **Video player** (`main.js`): any element with `data-videourl` or `data-videoid` opens YouTube, Instagram (`.ig-video`) or self-hosted videos in a lightbox (default) or inline (`data-mode="inline"`, rendered into `data-target`). Used by Featured Video.
 - **YouTube thumbnails:** `get_youtube_thumbnail()` caches the best existing size in a transient instead of querying YouTube on every page view.
-- **Fonts:** only the selected bundled fonts are declared and preloaded (`theme-optimization.php`, priority 1 in `wp_head`), and only the selected Font Library families get `@font-face` rules.
+- **Fonts:** only the selected bundled fonts are declared, only the selected Font Library families get `@font-face` rules, and only the faces the header and hero use are preloaded (see Font preloads).
 - **Google Maps:** Google Maps iframes in the content are replaced by `.gmap-lazy` placeholders loaded when visible; common Google Maps API script handles are dequeued. The `google_maps_embed_code` ACF field is base64-encoded in the browser before saving to avoid ModSecurity false positives; decode values that start with `base64:` before output.
 - **Head cleanup** (`theme-optimization.php`): RSD, wlwmanifest, shortlink, REST and oEmbed discovery links, feed links, emojis and the WooCommerce blocks style are removed. A direct Dashicons enqueue is dequeued on the front end unless the admin bar is showing (it is not deregistered, so plugin styles that depend on it keep it).
 
