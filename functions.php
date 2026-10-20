@@ -405,7 +405,7 @@ function growthlabseotheme01_scripts()
             wp_enqueue_style('growthlabseotheme01-template-team-member', get_template_directory_uri() . '/styles/page-templates/template-team-member-min.css', array(),  filemtime(get_template_directory() . '/styles/page-templates/template-team-member-min.css'));
         }
     }
-    if (is_home() || is_archive()) {
+    if (is_listing_page()) {
         wp_enqueue_style('growthlabseotheme01-template-default', get_template_directory_uri() . '/styles/page-templates/template-default-min.css', array(),  filemtime(get_template_directory() . '/styles/page-templates/template-default-min.css'));
         wp_enqueue_style('growthlabseotheme01-blog', get_template_directory_uri() . '/styles/page-templates/template-blog-min.css', array(),  filemtime(get_template_directory() . '/styles/page-templates/template-blog-min.css'));
     }
