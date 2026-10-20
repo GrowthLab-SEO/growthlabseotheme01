@@ -15,7 +15,7 @@
     ?>
 
     <?php
-    if (!$form_section['hide_section'] && !get_field('hide_form_section')):
+    if (!$form_section['hide_section'] && !get_page_field('hide_form_section')):
     ?>
       <section class="contact-form-footer">
 
@@ -57,7 +57,7 @@
     ?>
 
     <?php
-    if (!$locations_section['hide_section'] && !get_field('hide_locations_section')):
+    if (!$locations_section['hide_section'] && !get_page_field('hide_locations_section')):
     ?>
 
       <section class="locations-footer bg-bicolor">
@@ -133,21 +133,21 @@
     ?>
 
     <?php
-    if (!$copyright_section['hide_section'] && !get_field("hide_copyright_section")):
+    if (!$copyright_section['hide_section'] && !get_page_field("hide_copyright_section")):
     ?>
       <section class="copyright-footer">
         <div class="copyright-footer__wrapper container">
 
-          <?php if (!get_field("hide_social_networks")): ?>
+          <?php if (!get_page_field("hide_social_networks")): ?>
             <div class="copyright-footer__social">
               <?php get_template_part('template-parts/social', 'networks'); ?>
             </div>
           <?php endif ?>
 
           <?php
-          $footer_links_menu = get_field("footer_links_menu") ?: ($copyright_section['footer_links_menu'] ?? null);
+          $footer_links_menu = get_page_field("footer_links_menu") ?: ($copyright_section['footer_links_menu'] ?? null);
 
-          if (isset($footer_links_menu) && $footer_links_menu && !get_field("hide_menu") && !empty($footer_links_menu)) {
+          if (isset($footer_links_menu) && $footer_links_menu && !get_page_field("hide_menu") && !empty($footer_links_menu)) {
             wp_nav_menu(
               array(
                 'menu'  => $footer_links_menu,

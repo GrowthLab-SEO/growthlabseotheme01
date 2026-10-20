@@ -248,7 +248,7 @@ function growthlabseotheme01_request_uses_splide()
     $locations_section = $options['locations_section'] ?? array();
 
     return empty($locations_section['hide_section'])
-        && !get_field('hide_locations_section')
+        && !get_page_field('hide_locations_section')
         && !empty($options['offices'])
         && count($options['offices']) > 1;
 }

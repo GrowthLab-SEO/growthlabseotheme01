@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 //Default Properties
 foreach ($args as $field => $content) $$field = $content;
 //Internal Fields
-foreach (fill_acf_group_defaults(get_field('hero_properties'), 'hero_properties') as $key => $value) $$key = $value;
+foreach (fill_acf_group_defaults(get_page_field('hero_properties'), 'hero_properties') as $key => $value) $$key = $value;
 $cta_button = isset($hero_cta_button) && $hero_cta_button ? $hero_cta_button :   $hero_cta_button_default;
 $cta_button_2 = isset($hero_cta_button_2) && $hero_cta_button_2 ? $hero_cta_button_2 : null;
 
@@ -34,7 +34,7 @@ if (!$bg_mobile) $bg_mobile = [];
                     <div class="content-box__main">
                         <?php
                         print_title($args["hero_title"], $args["hero_title_tag"], "content-box__title", true);
-                        print_title($hero_subtitle, $hero_subtitle_tag, "content-box__subtitle", true);
+                        print_title($hero_subtitle, $hero_subtitle_tag, "content-box__subtitle");
                         ?>
                     </div>
 

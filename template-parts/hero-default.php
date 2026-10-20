@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 foreach ($args as $field => $content) $$field = $content;
 
 //Internal Fields
-foreach (fill_acf_group_defaults(get_field('hero_properties'), 'hero_properties') as $key => $value) $$key = $value;
+foreach (fill_acf_group_defaults(get_page_field('hero_properties'), 'hero_properties') as $key => $value) $$key = $value;
 $cta_button = isset($hero_cta_button) && $hero_cta_button ? $hero_cta_button : $hero_cta_button_default;
 
 //Hero pictures
