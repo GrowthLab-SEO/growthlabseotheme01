@@ -11,7 +11,7 @@ function positionCTABox(element) {
   const box = element.querySelector(".cta-box__box");
   if (!box) return;
 
-  // FASE DE LECTURA — todo junto antes de tocar el DOM
+  // READ PHASE — all at once before touching the DOM
   const boxHeight = box.offsetHeight || 0;
   if (boxHeight === 0) return;
 
@@ -23,7 +23,7 @@ function positionCTABox(element) {
   const nextSibling = element.nextElementSibling;
   const isFooter = nextSibling?.classList.contains("site-footer");
 
-  // FASE DE ESCRITURA — todo dentro del rAF
+  // WRITE PHASE — everything inside the rAF
   requestAnimationFrame(() => {
     element.style.setProperty("--cta-approximate-top", `${topPosition}px`);
     element.classList.add("cta-measured");
@@ -70,7 +70,7 @@ const observer = new IntersectionObserver(
 ctaBoxes.forEach((ctaBox) => observer.observe(ctaBox));
 
 function checkVisible() {
-  // FASE DE LECTURA — recolectar todos los rects antes de posicionar
+  // READ PHASE — collect all rects before positioning
   const visible = [];
   ctaBoxes.forEach((element) => {
     const rect = element.getBoundingClientRect();
@@ -79,7 +79,7 @@ function checkVisible() {
     }
   });
 
-  // FASE DE ESCRITURA — posicionar después de leer todo
+  // WRITE PHASE — position after reading everything
   visible.forEach((element) => positionCTABox(element));
 }
 
@@ -95,7 +95,7 @@ window.addEventListener(
   () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      // FASE DE LECTURA primero
+      // READ PHASE first
       const visible = [];
       ctaBoxes.forEach((element) => {
         const rect = element.getBoundingClientRect();
@@ -104,7 +104,7 @@ window.addEventListener(
         }
       });
 
-      // FASE DE ESCRITURA después
+      // WRITE PHASE afterwards
       positionedBoxes.clear();
       visible.forEach((element) => positionCTABox(element));
     }, 150);

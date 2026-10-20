@@ -980,7 +980,7 @@ if (!function_exists('img_generate_cover_picture')) {
             }
         }
 
-        // Acumula dimensiones reales por breakpoint para las custom properties.
+        // Accumulate actual dimensions per breakpoint for the custom properties.
         $bp_ratios      = [];
         $non_mobile_bps = array_filter($bp_order, fn($bp) => $bp !== 'mobile');
 

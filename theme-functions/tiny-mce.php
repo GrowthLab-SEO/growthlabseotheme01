@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Helper interno — construye el array de colores del tema sanitizado
- * para uso en TinyMCE.
+ * Internal helper — builds the sanitized theme color array
+ * for use in TinyMCE.
  */
 if (!function_exists('_theme_get_tinymce_color_map')) {
     function _theme_get_tinymce_color_map(): array
@@ -129,7 +129,7 @@ if (!function_exists('my_acf_tinymce_colors_script')) {
 }
 add_action('acf/input/admin_head', 'my_acf_tinymce_colors_script');
 
-// 6️⃣ Inject colors directamente en la configuración de TinyMCE
+// 6️⃣ Inject colors directly into the TinyMCE configuration
 if (!function_exists('my_wp_editor_colors_direct')) {
     function my_wp_editor_colors_direct($init)
     {
@@ -223,7 +223,7 @@ function my_wp_editor_default_settings($init)
 }
 add_filter('tiny_mce_before_init', 'my_wp_editor_default_settings', 20);
 
-// Inyecta colores directamente en cada instancia de TinyMCE cuando se crea (más fiable)
+// Inject colors directly into each TinyMCE instance when it is created (more reliable)
 function my_wp_editor_colors_apply_on_add()
 {
     $map_json = wp_json_encode(_theme_get_tinymce_color_map());
@@ -239,17 +239,17 @@ function my_wp_editor_colors_apply_on_add()
                 editor.settings.textcolor_map = customColors;
                 editor.settings.textcolor_cols = customCols;
 
-                // Forzar actualización de estado e intentar refrescar UI
+                // Force a state update and try to refresh the UI
                 try {
                     editor.nodeChanged();
-                } catch (err) { /* no crítico */ }
+                } catch (err) { /* not critical */ }
 
-                // Si el botón forecolor existe, intentar forzar reconstrucción del menú
+                // If the forecolor button exists, try to force the menu to rebuild
                 try {
                     var btn = editor.ui.registry.getAll && editor.ui && editor.ui.registry && editor.ui.registry.getAll && editor.ui.registry.getAll().buttons && editor.ui.registry.getAll().buttons.forecolor;
                     if (btn && typeof btn.onAction === 'function') {
-                        // No podemos reconstruir internamente el plugin desde aquí fácilmente,
-                        // pero al tener editor.settings actualizado la próxima apertura del picker debería usarlo.
+                        // We can't easily rebuild the plugin internals from here,
+                        // but with editor.settings updated the next time the picker opens it should use them.
                     }
                 } catch (e) {}
             } catch (e) {
@@ -257,16 +257,16 @@ function my_wp_editor_colors_apply_on_add()
             }
         }
 
-        // Si tinymce ya está cargado
+        // If tinymce is already loaded
         if (window.tinymce && window.tinymce.EditorManager) {
-            // Aplicar a los editores ya creados
+            // Apply to editors that already exist
             for (var id in tinymce.editors) {
                 if (tinymce.editors.hasOwnProperty(id)) {
                     applyToEditor(tinymce.editors[id]);
                 }
             }
 
-            // Aplicar a nuevos editores cuando se añadan
+            // Apply to new editors as they are added
             if (tinymce.EditorManager.on) {
                 tinymce.EditorManager.on('AddEditor', function(e){
                     applyToEditor(e.editor);
@@ -277,7 +277,7 @@ function my_wp_editor_colors_apply_on_add()
                 });
             }
         } else {
-            // Si tinymce no está aún, esperar y aplicar cuando esté listo
+            // If tinymce isn't there yet, wait and apply once it is ready
             var wait = setInterval(function(){
                 if (window.tinymce && tinymce.EditorManager) {
                     clearInterval(wait);

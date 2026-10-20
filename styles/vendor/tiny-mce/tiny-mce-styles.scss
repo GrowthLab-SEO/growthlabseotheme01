@@ -81,13 +81,13 @@
     format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
-// Asegurar que las fuentes estén disponibles en el iframe
+// Make sure the fonts are available inside the iframe
 body#tinymce,
 .mce-content-body {
   font-family: "Open Sans", sans-serif;
 }
 
-// TinyMCE necesita que estas familias estén definidas para poder aplicarlas
+// TinyMCE needs these families defined in order to apply them
 body,
 p,
 h1,
@@ -105,7 +105,7 @@ h6 {
   }
 }
 
-// Soporte directo para cuando TinyMCE aplica inline styles
+// Direct support for when TinyMCE applies inline styles
 *[style*="font-family: fraunces"],
 *[style*="font-family: 'fraunces'"] {
   font-family: "Fraunces", serif !important;
@@ -116,7 +116,7 @@ h6 {
   font-family: "Open Sans", sans-serif !important;
 }
 
-// Clases auxiliares (opcional)
+// Helper classes (optional)
 .open-sans {
   font-family: "Open Sans", sans-serif;
 }

@@ -265,7 +265,7 @@ function findConsecutiveGroups() {
           wrapper.appendChild(entry.target);
           observer.unobserve(entry.target);
 
-          // Una vez movido, si el wrapper tiene ya el resto de elementos, podemos activar la carga diferencial.
+          // Once moved, if the wrapper already holds the rest of the elements, we can trigger the lazy load.
           if (wrapper.children.length === group.length) {
             lazyLoadBgBicolor();
           }
@@ -308,7 +308,7 @@ function lazyLoadBgBicolor() {
 
   const init = () => bgBicolorElements.forEach((el) => observer.observe(el));
 
-  // Si load ya disparó (script defer), init directo
+  // If load has already fired (deferred script), init right away
   if (document.readyState === "complete") {
     init();
   } else {

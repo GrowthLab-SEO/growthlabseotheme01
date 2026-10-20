@@ -19,7 +19,7 @@
     padding: 0 !important;
     z-index: 20;
 
-    // Fallback para diferentes viewports (por si JavaScript falla)
+    // Fallbacks for different viewports (in case JavaScript fails)
     --cta-approximate-top: 400px; // Mobile fallback
 
     @media (min-width: 768px) {
@@ -65,12 +65,12 @@
       transition:
         opacity 0.3s ease,
         visibility 0s 0.3s,
-        // ✅ CORREGIDO: delay visibility
+        // ✅ FIXED: delay visibility
         margin-top 0.15s ease,
         padding-bottom 0.15s ease;
     }
 
-    // ✅ NUEVO: Aplicar valores aproximados cuando se mide
+    // ✅ NEW: Apply approximate values once measured
     &.cta-measured #{$parent}__wrapper {
       margin-top: calc(var(--cta-approximate-top) * -1);
       padding-bottom: var(--cta-approximate-top);
@@ -83,7 +83,7 @@
       transition:
         opacity 0.2s ease,
         visibility 0s,
-        // ✅ CORREGIDO: no delay when showing
+        // ✅ FIXED: no delay when showing
         margin-top 0.15s ease,
         padding-bottom 0.15s ease;
     }
@@ -183,7 +183,7 @@
       }
 
       #{$parent}__content p {
-        color: rgb(var(--text-color)); // ✅ CORREGIDO: quitado el "x"
+        color: rgb(var(--text-color)); // ✅ FIXED: removed the "x"
       }
 
       #{$parent}__separator {
