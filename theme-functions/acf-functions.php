@@ -125,7 +125,7 @@ add_filter('should_load_separate_core_block_assets', '__return_true');
  */
 add_action('wp_enqueue_scripts', function () {
     // Blocks of the current singular post, including inner blocks (parsed once per request)
-    $blocks = get_current_post_blocks(true);
+    $blocks = get_current_post_blocks();
     if (empty($blocks)) return;
 
     $registered_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
