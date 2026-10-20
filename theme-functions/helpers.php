@@ -45,6 +45,171 @@ if (!function_exists('get_field_options')) {
     }
 }
 
+if (!function_exists('block_style_attribute')) {
+    function block_style_attribute($block = [])
+    {
+        if (empty($block['style'])) {
+            return '';
+        }
+
+        $style_attr = '';
+
+        if (is_string($block['style'])) {
+            $style_attr = $block['style'];
+        } elseif (is_array($block['style'])) {
+            if (!empty($block['style']['spacing'])) {
+                $s = $block['style']['spacing'];
+                if (is_string($s)) {
+                    $style_attr .= $s . ' ';
+                } elseif (is_array($s)) {
+                    if (!empty($s['padding'])) {
+                        $style_attr .= normalize_spacing_property('padding', $s['padding']) . ' ';
+                    }
+                    if (!empty($s['margin'])) {
+                        $style_attr .= normalize_spacing_property('margin', $s['margin']) . ' ';
+                    }
+                    if (!empty($s['blockGap'])) {
+                        $style_attr .= 'gap: ' . normalize_block_spacing($s['blockGap']) . '; ';
+                    }
+                }
+            }
+
+            foreach ($block['style'] as $k => $v) {
+                if ($k === 'spacing') {
+                    continue;
+                }
+                if (is_string($v) || is_numeric($v)) {
+                    $style_attr .= "$k: " . normalize_block_spacing($v) . '; ';
+                }
+            }
+        }
+
+        $style_attr = trim($style_attr);
+        if (!$style_attr) {
+            return '';
+        }
+
+        return ' style="' . esc_attr($style_attr) . '"';
+    }
+}
+
+if (!function_exists('normalize_spacing_property')) {
+    function normalize_spacing_property($property = 'padding', $value = null)
+    {
+        if (!$value) {
+            return '';
+        }
+
+        if (is_string($value)) {
+            return "$property: " . normalize_block_spacing($value) . ';';
+        }
+
+        if (is_numeric($value)) {
+            return "$property: " . normalize_block_spacing($value) . ';';
+        }
+
+        if (!is_array($value)) {
+            return '';
+        }
+
+        $unit = $value['unit'] ?? $value['unitType'] ?? '';
+        $t = $value['top'] ?? null;
+        $r = $value['right'] ?? null;
+        $b = $value['bottom'] ?? null;
+        $l = $value['left'] ?? null;
+
+        $t_formatted = $t !== null ? format_spacing_item($t, $unit) : '';
+        $r_formatted = $r !== null ? format_spacing_item($r, $unit) : '';
+        $b_formatted = $b !== null ? format_spacing_item($b, $unit) : '';
+        $l_formatted = $l !== null ? format_spacing_item($l, $unit) : '';
+
+        if (!$t_formatted && !$r_formatted && !$b_formatted && !$l_formatted) {
+            return '';
+        }
+
+        if ($t_formatted && $r_formatted && $b_formatted && $l_formatted) {
+            if ($t_formatted === $r_formatted && $t_formatted === $b_formatted && $t_formatted === $l_formatted) {
+                return "$property: $t_formatted;";
+            }
+            if ($t_formatted === $b_formatted && $r_formatted === $l_formatted) {
+                return "$property: $t_formatted $r_formatted;";
+            }
+            if ($r_formatted === $l_formatted) {
+                return "$property: $t_formatted $r_formatted $b_formatted;";
+            }
+            return "$property: $t_formatted $r_formatted $b_formatted $l_formatted;";
+        }
+
+        $output = '';
+        if ($t_formatted) {
+            $output .= "$property-top: $t_formatted; ";
+        }
+        if ($r_formatted) {
+            $output .= "$property-right: $r_formatted; ";
+        }
+        if ($b_formatted) {
+            $output .= "$property-bottom: $b_formatted; ";
+        }
+        if ($l_formatted) {
+            $output .= "$property-left: $l_formatted; ";
+        }
+
+        return rtrim($output, ' ');
+    }
+}
+
+if (!function_exists('normalize_block_spacing')) {
+    function normalize_block_spacing($value)
+    {
+        if (is_string($value) && $value !== '' && preg_match('/^\d+(\.\d+)?$/', $value)) {
+            return $value . 'px';
+        }
+
+        if (is_numeric($value)) {
+            return $value . 'px';
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            $unit = $value['unit'] ?? $value['unitType'] ?? '';
+
+            if (!empty($value['size'])) {
+                return format_spacing_item($value['size'], $unit);
+            }
+
+            $items = array_filter(array_map(function ($item) use ($unit) {
+                return format_spacing_item($item, $unit);
+            }, $value));
+
+            return implode(' ', $items);
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('format_spacing_item')) {
+    function format_spacing_item($value, $unit = '')
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        if (is_string($value) && preg_match('/^\d+(\.\d+)?$/', $value)) {
+            return $value . ($unit ?: 'px');
+        }
+
+        if (is_numeric($value)) {
+            return $value . ($unit ?: 'px');
+        }
+
+        return (string) $value;
+    }
+}
+
 // Language Filter
 if (!function_exists('filterContentByLanguage')) {
     function filterContentByLanguage($lang = 'es')

@@ -18,7 +18,7 @@ if (get_field('toggle_block')):
         } else if (!isset($background_image) || !$background_image) {
             echo "bg-bicolor";
         }
-        ?>"
+        ?><?= !empty($block['className']) ? ' ' . esc_attr($block['className']) : '' ?>"<?= block_style_attribute($block) ?>
         <?= get_block_extract_attribute(($extract_block_from_content ?? false) && !$show_only_contact_form, $place ?? '') ?>>
 
         <div class="contact-form__layer">

@@ -10,13 +10,20 @@ if (get_field('toggle_block')):
     $raw_background_color = trim((string) ($background_color ?? ''));
     $background_color = sanitize_hex_color($raw_background_color)
         ?: (preg_match('/^rgba?\(\s*[\d.\s,%]+\)$/i', $raw_background_color) ? $raw_background_color : '');
+
+    // The background color shares the style attribute with the editor's spacing
+    $style_block = $block;
+    if ($background_color) {
+        $block_style = $block['style'] ?? [];
+        $style_block['style'] = is_array($block_style) ? $block_style : ['spacing' => (string) $block_style];
+        $style_block['style']['background-color'] = $background_color;
+    }
 ?>
 
     <section<?= get_block_id_attribute($block_id ?? '') ?>
-        class="block logos-carousel<?php if (!$background_color) echo ' bg-bicolor'; ?>"
+        class="block logos-carousel<?php if (!$background_color) echo ' bg-bicolor'; ?><?= !empty($block['className']) ? ' ' . esc_attr($block['className']) : '' ?>"<?= block_style_attribute($style_block) ?>
         <?php
         echo get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '');
-        if ($background_color) echo ' style="' . esc_attr('background-color: ' . $background_color . ';') . '"';
         ?>>
 
         <div class="logos-carousel__wrapper container tx-center">

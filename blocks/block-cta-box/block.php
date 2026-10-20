@@ -12,7 +12,7 @@ if (get_field('toggle_block')):
 ?>
 
     <section<?= get_block_id_attribute($block_id ?? '') ?>
-        class="block cta-box <?= esc_attr($box_position ?? "") ?> <?= esc_attr($block_style ?? "") ?>  <?php if ($box_position === "within" || ($box_position === "full" && !$background_image)) echo "bg-bicolor"; ?>"
+        class="block cta-box <?= esc_attr($box_position ?? "") ?> <?= esc_attr($block_style ?? "") ?>  <?php if ($box_position === "within" || ($box_position === "full" && !$background_image)) echo "bg-bicolor"; ?><?= !empty($block['className']) ? ' ' . esc_attr($block['className']) : '' ?>"<?= block_style_attribute($block) ?>
         <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
