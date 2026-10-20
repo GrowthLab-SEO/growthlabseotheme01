@@ -27,7 +27,7 @@ $icon_dir = get_template_directory() . '/assets/icons/';
                     <?php
                     $icon_path = $icon_dir . $icon_file;
                     if (file_exists($icon_path)) {
-                        include $icon_path;
+                        echo get_theme_svg('assets/icons/' . $icon_file);
                     } else {
                         echo '<!-- Icon ' . esc_attr($icon_file) . ' not found -->';
                     }

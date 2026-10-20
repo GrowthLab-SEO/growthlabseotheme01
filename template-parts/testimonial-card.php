@@ -15,19 +15,19 @@ if (!defined('ABSPATH')) {
                         <?php
                         switch ($args["source"]) {
                             case 'fb':
-                                include get_template_directory() . '/assets/icons/icon-facebook.svg';
+                                echo get_theme_svg('assets/icons/icon-facebook.svg');
                                 break;
                             case 'inst':
-                                include get_template_directory() . '/assets/icons/icon-instagram.svg';
+                                echo get_theme_svg('assets/icons/icon-instagram.svg');
                                 break;
                             case 'gg':
-                                include get_template_directory() . '/assets/icons/icon-google.svg';
+                                echo get_theme_svg('assets/icons/icon-google.svg');
                                 break;
                             case 'lin':
-                                include get_template_directory() . '/assets/icons/icon-linkedin.svg';
+                                echo get_theme_svg('assets/icons/icon-linkedin.svg');
                                 break;
                             case 'x':
-                                include get_template_directory() . '/assets/icons/icon-twitter-x.svg';
+                                echo get_theme_svg('assets/icons/icon-twitter-x.svg');
                                 break;
                             default:
                                 break;
@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
                 <?php endif ?>
 
                 <div class="testimonial-card__quote">
-                    <?php include get_template_directory() . '/assets/icons/icon-quote.svg'; ?>
+                    <?php echo get_theme_svg('assets/icons/icon-quote.svg'); ?>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ if (!defined('ABSPATH')) {
                 <?php
                 $i = 1;
                 while ($i <= 5) {
-                    include get_template_directory() . '/assets/icons/icon-star.svg';
+                    echo get_theme_svg('assets/icons/icon-star.svg');
                     $i++;
                 }
                 ?>
