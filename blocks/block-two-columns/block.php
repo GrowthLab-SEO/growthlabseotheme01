@@ -27,7 +27,7 @@ if (get_field('toggle_block')):
             <?php if ($has_text): ?>
                 <div class="two-columns__col">
                     <div class="formatted-text two-columns__content">
-                        <?= $text_content ?? "" ?>
+                        <?= wp_kses_post($text_content ?? "") ?>
 
                         <?php if (!empty($cta_link['url'])):
                             $cta_target = !empty($cta_link['target']) ? $cta_link['target'] : '_self';

@@ -24,7 +24,7 @@ if (get_field('toggle_block')):
 
             <?php if ($text_content): ?>
                 <div class="faq__content formatted-text tx-center">
-                    <?= $text_content ?>
+                    <?= wp_kses_post($text_content ?? '') ?>
                 </div>
             <?php endif ?>
 
@@ -51,7 +51,7 @@ if (get_field('toggle_block')):
                                         </div>
                                         <div class="faq__answer accordion__content">
                                             <div class="formatted-text accordion__inner">
-                                                <?= $faq['answer'] ?? '' ?>
+                                                <?= wp_kses_post($faq['answer'] ?? '') ?>
                                             </div>
                                         </div>
                                     </div>
@@ -68,10 +68,10 @@ if (get_field('toggle_block')):
             </div>
 
 
-            <?php if ($cta_link): ?>
+            <?php if (!empty($cta_link['url'])): ?>
                 <div class="faq__btn">
-                    <a href="<?= esc_url($cta_link['url']) ?>" target="<?= esc_attr($cta_link['target']) ?>" class="btn btn--secondary">
-                        <span><?= esc_html($cta_link['title']) ?></span>
+                    <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' : '' ?> class="btn btn--secondary">
+                        <span><?= esc_html($cta_link['title'] ?? '') ?></span>
                     </a>
                 </div>
             <?php endif ?>

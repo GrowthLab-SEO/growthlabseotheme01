@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<div class="result-card <?= $args["classes"] ?>">
+<div class="result-card <?= esc_attr($args["classes"] ?? "") ?>">
     <div class="result-card__wrapper">
         <div class="result-card__inner border-box tx-center">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,11 +11,11 @@ if (!defined('ABSPATH')) {
                 <path d="M60.333 62V63.5H33.333V62H60.333ZM61.833 60.5V56.5C61.833 55.6716 61.1614 55 60.333 55H33.333C32.5046 55 31.833 55.6716 31.833 56.5V60.5C31.833 61.3284 32.5046 62 33.333 62V63.5L33.1787 63.4961C31.6447 63.4184 30.4146 62.1883 30.3369 60.6543L30.333 60.5V56.5C30.333 54.8431 31.6762 53.5 33.333 53.5H60.333C61.9899 53.5 63.333 54.8431 63.333 56.5V60.5L63.3291 60.6543C63.2514 62.1883 62.0213 63.4184 60.4873 63.4961L60.333 63.5V62C61.1614 62 61.833 61.3284 61.833 60.5Z" fill="#AE853A" />
             </svg>
 
-            <span class="result-card__amount">$<?= format_number_abbreviated($args["numerical_amount"]) ?></span>
+            <span class="result-card__amount">$<?= esc_html(format_number_abbreviated($args["numerical_amount"] ?? 0)) ?></span>
 
-            <p class="result-card__title"><?= $args["case_title"] ?></p>
+            <p class="result-card__title"><?= wp_kses_post($args["case_title"] ?? "") ?></p>
 
-            <p class="result-card__description"><?= $args["case_description"] ?></p>
+            <p class="result-card__description"><?= wp_kses_post($args["case_description"] ?? "") ?></p>
         </div>
     </div>
 </div>

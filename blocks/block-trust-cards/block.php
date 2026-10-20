@@ -28,14 +28,14 @@ if (get_field('toggle_block')):
 
                 <div class="trust-cards__grid tx-center">
 
-                    <?php if (isset($heading_card) && ($heading_card["first_line"] || $heading_card["second_line"])): ?>
+                    <?php if (!empty($heading_card["first_line"]) || !empty($heading_card["second_line"])): ?>
                         <div class="trust-card trust-card--heading">
                             <div class="trust-card__wrapper">
                                 <div class="trust-card__inner border-box">
                                     <?php
-                                    echo "<span>" . $heading_card['first_line'] . "</span>";
+                                    echo "<span>" . wp_kses_post($heading_card['first_line'] ?? '') . "</span>";
                                     get_template_part('template-parts/ampersand', 'separator', array('classes' => 'trust-card__separator'));
-                                    echo "<span>" . $heading_card['second_line'] . "</span>";
+                                    echo "<span>" . wp_kses_post($heading_card['second_line'] ?? '') . "</span>";
                                     ?>
                                 </div>
                             </div>
@@ -47,7 +47,7 @@ if (get_field('toggle_block')):
                             <div class="trust-card__wrapper">
                                 <div class="trust-card__inner border-box">
                                     <div class="formatted-text">
-                                        <?= $intro_card_content ?>
+                                        <?= wp_kses_post($intro_card_content ?? '') ?>
                                     </div>
                                 </div>
                             </div>
@@ -70,9 +70,9 @@ if (get_field('toggle_block')):
                                                         <div class="trust-card__inner">
                                                             <span class="trust-card__number"><?= $i ?></span>
 
-                                                            <p class="trust-card__title"><?= $item['title'] ?? '' ?></p>
+                                                            <p class="trust-card__title"><?= wp_kses_post($item['title'] ?? '') ?></p>
 
-                                                            <p class="trust-card__content"><?= $item['content'] ?? '' ?></p>
+                                                            <p class="trust-card__content"><?= wp_kses_post($item['content'] ?? '') ?></p>
                                                         </div>
                                                     </div>
                                                 </li>

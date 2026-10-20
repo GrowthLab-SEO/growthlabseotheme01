@@ -41,7 +41,7 @@
 
               <?php if (!empty($form_section['message_before_submit'])): ?>
                 <div class="contact-form__message formatted-text tx-center flex-center">
-                  <?= $form_section['message_before_submit'] ?>
+                  <?= wp_kses_post($form_section['message_before_submit']) ?>
                 </div>
               <?php endif; ?>
 
@@ -67,7 +67,7 @@
             <?php
             print_title($locations_section['locations_title'] ?? '', $locations_section['locations_title_tag'] ?? '', "locations-footer__title");
             get_template_part('template-parts/ampersand', 'separator', array('classes' => 'locations-footer__separator'));
-            echo $locations_section['locations_main_content'] ?? '';
+            echo wp_kses_post($locations_section['locations_main_content'] ?? '');
             ?>
           </div>
 
@@ -80,7 +80,7 @@
                   <div class="location-card__inner flex-center">
                     <?php if (!empty($locations_section['first_card']['logo'])) img_print_picture_tag(img: $locations_section['first_card']['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                     <div class="location-card__content tx-center">
-                      <?= $locations_section['first_card']['content'] ?>
+                      <?= wp_kses_post($locations_section['first_card']['content']) ?>
                     </div>
                   </div>
                 </div>
@@ -164,11 +164,11 @@
           ?>
 
           <a href="https://growthlabseo.com/" target="_blank" class="copyright-footer__logo">
-            <img src="<?= get_template_directory_uri() . "/assets/img/Growth-Lab-Logo.png" ?>" alt="Growth Lab SEO Logo" width="270" height="50">
+            <img src="<?= esc_url(get_template_directory_uri() . "/assets/img/Growth-Lab-Logo.png") ?>" alt="Growth Lab SEO Logo" width="270" height="50">
           </a>
 
           <p class="copyright-footer__advertisement tx-center">
-            <?= $copyright_section['copyright'] ?? '' ?>
+            <?= wp_kses_post($copyright_section['copyright'] ?? '') ?>
           </p>
 
         </div>

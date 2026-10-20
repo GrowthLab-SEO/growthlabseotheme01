@@ -99,9 +99,9 @@ if (!defined('ABSPATH')) {
                 </div>
             <?php endif; ?>
 
-            <?php if ($cta_button): ?>
+            <?php if (!empty($cta_button['url'])): ?>
                 <div class="site-header__cta">
-                    <a href="<?= esc_url($cta_button['url']) ?>" class="cta-button btn btn--tertiary btn--arrow" target="<?= esc_attr($cta_button['target']) ?>" aria-label="<?= esc_attr($cta_button['title']) ?>">
+                    <a href="<?= esc_url($cta_button['url']) ?>" class="cta-button btn btn--tertiary btn--arrow"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' : '' ?> aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
 
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-button__icon">
                             <g clip-path="url(#clip0_4184_2633)">
@@ -115,7 +115,7 @@ if (!defined('ABSPATH')) {
                         </svg>
 
                         <span class="cta-button__text">
-                            <?= $cta_button['title'] ?>
+                            <?= esc_html($cta_button['title'] ?? '') ?>
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M1.25 10C1.25 9.83423 1.31585 9.67526 1.43306 9.55805C1.55027 9.44084 1.70924 9.375 1.875 9.375H16.6163L12.6825 5.4425C12.5651 5.32514 12.4992 5.16597 12.4992 5C12.4992 4.83403 12.5651 4.67485 12.6825 4.5575C12.7999 4.44014 12.959 4.37421 13.125 4.37421C13.291 4.37421 13.4501 4.44014 13.5675 4.5575L18.5675 9.5575C18.6257 9.61555 18.6719 9.68452 18.7034 9.76045C18.7349 9.83639 18.7511 9.91779 18.7511 10C18.7511 10.0822 18.7349 10.1636 18.7034 10.2395C18.6719 10.3155 18.6257 10.3844 18.5675 10.4425L13.5675 15.4425C13.4501 15.5599 13.291 15.6258 13.125 15.6258C12.959 15.6258 12.7999 15.5599 12.6825 15.4425C12.5651 15.3251 12.4992 15.166 12.4992 15C12.4992 14.834 12.5651 14.6749 12.6825 14.5575L16.6163 10.625H1.875C1.70924 10.625 1.55027 10.5591 1.43306 10.4419C1.31585 10.3247 1.25 10.1658 1.25 10Z" fill="#F4F3EE" />
                             </svg>
@@ -130,11 +130,11 @@ if (!defined('ABSPATH')) {
 
                     <div class="callout">
                         <?php if ($top_callout_first_line): ?>
-                            <span><?= $top_callout_first_line ?></span>
+                            <span><?= wp_kses_post($top_callout_first_line) ?></span>
                         <?php endif; ?>
-                        <a href="tel:+1<?= get_flat_number($phone_number) ?>" class="callout__phone" aria-label="<?= esc_attr($phone_number) ?>"><?= $phone_number ?></a>
+                        <a href="<?= get_phone_href($phone_number) ?>" class="callout__phone" aria-label="<?= esc_attr($phone_number) ?>"><?= esc_html($phone_number) ?></a>
                         <?php if ($top_callout_second_line): ?>
-                            <span><?= $top_callout_second_line ?></span>
+                            <span><?= wp_kses_post($top_callout_second_line) ?></span>
                         <?php endif; ?>
                     </div>
 

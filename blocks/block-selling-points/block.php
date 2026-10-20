@@ -23,7 +23,7 @@ if (get_field('toggle_block')):
             if (isset($text_content) && $text_content):
             ?>
                 <div class="selling-points__content formatted-text tx-center">
-                    <?= $text_content ?>
+                    <?= wp_kses_post($text_content ?? '') ?>
                 </div>
             <?php
             endif
@@ -48,14 +48,14 @@ if (get_field('toggle_block')):
                                                 </div>
 
                                                 <?php
-                                                $title_html = !empty($item['link'])
-                                                    ? "<a href='" . esc_url($item['link']["url"]) . "' target='" . esc_attr($item['link']["target"]) . "' class='item-card__link'>" . $item_title . "</a>"
+                                                $title_html = !empty($item['link']['url'])
+                                                    ? '<a href="' . esc_url($item['link']['url']) . '"' . (!empty($item['link']['target']) ? ' target="' . esc_attr($item['link']['target']) . '"' : '') . ' class="item-card__link">' . $item_title . '</a>'
                                                     : $item_title;
                                                 print_title($title_html, $item['title_tag'] ?? 'p', "item-card__title");
                                                 ?>
 
                                                 <?php if (!empty($item['content'])): ?>
-                                                    <p class="item-card__description"><?= $item['content'] ?></p>
+                                                    <p class="item-card__description"><?= wp_kses_post($item['content'] ?? '') ?></p>
                                                 <?php endif; ?>
                                             </div>
                                         </div>

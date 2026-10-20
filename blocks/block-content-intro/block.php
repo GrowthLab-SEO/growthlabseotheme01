@@ -32,7 +32,7 @@ if (get_field('toggle_block')):
                         if (isset($first_paragraph) && $first_paragraph):
                         ?>
                             <div class="content-intro__heading-text formatted-text tx-center">
-                                <?= $first_paragraph;  ?>
+                                <?= wp_kses_post($first_paragraph ?? '') ?>
                             </div>
                         <?php endif ?>
                     </div>
@@ -56,19 +56,19 @@ if (get_field('toggle_block')):
                                     } else {
                                         echo get_theme_svg('assets/img/separator-symbol.svg');
                                     } ?>
-                                    <p><?= $featured_image['picture_caption'] ?></p>
+                                    <p><?= wp_kses_post($featured_image['picture_caption'] ?? '') ?></p>
                                 </div>
 
                             <?php endif ?>
                         </div>
                     <?php endif ?>
 
-                    <?= $text_content ?>
+                    <?= wp_kses_post($text_content ?? '') ?>
 
-                    <?php if ($cta_link): ?>
+                    <?php if (!empty($cta_link['url'])): ?>
                         <div class="content-intro__btn">
-                            <a href="<?= esc_url($cta_link['url']) ?>" target="<?= esc_attr($cta_link['target']) ?>" class="btn btn--secondary">
-                                <span><?= esc_html($cta_link['title']) ?></span>
+                            <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' : '' ?> class="btn btn--secondary">
+                                <span><?= esc_html($cta_link['title'] ?? '') ?></span>
                             </a>
                         </div>
                     <?php endif ?>
@@ -89,7 +89,7 @@ if (get_field('toggle_block')):
                                     } else {
                                         echo get_theme_svg('assets/img/separator-symbol.svg');
                                     } ?>
-                                    <p><?= $featured_image['picture_caption'] ?></p>
+                                    <p><?= wp_kses_post($featured_image['picture_caption'] ?? '') ?></p>
                                 </div>
 
                             <?php endif ?>

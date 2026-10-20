@@ -22,7 +22,7 @@ if (get_field('toggle_block')):
                 img_print_picture_tag(img: $cover_image, is_cover: true, classes: "featured-video__cover");
             } elseif ($video_id) {
                 $thumb = get_youtube_thumbnail($video_id, 'maxresdefault');
-                echo "<img data-src='" . esc_url($thumb) . "' alt='' class='featured-video__cover lazy-image'>";
+                echo '<img data-src="' . esc_url($thumb) . '" alt="" class="featured-video__cover lazy-image">';
             }
 
             if ($is_youtube_video && !empty($youtube_url) && !$video_id) {
@@ -38,9 +38,9 @@ if (get_field('toggle_block')):
                     class="featured-video__btn"
                     <?php
                     if ($is_youtube_video) {
-                        echo "data-videourl='" . esc_url($youtube_url) . "'";
+                        echo 'data-videourl="' . esc_url($youtube_url) . '"';
                     } else {
-                        echo "data-videoid='" . esc_url($video) . "'";
+                        echo 'data-videoid="' . esc_url($video) . '"';
                     }
                     ?>
                     data-mode="<?= !empty($enable_lightbox) ? 'lightbox' : 'inline' ?>"

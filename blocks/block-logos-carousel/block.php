@@ -43,7 +43,7 @@ if (get_field('toggle_block')):
                                     <div class="logo splide__slide">
                                         <?php if ($has_link): ?>
                                             <a href="<?= esc_url($logo['link']['url']); ?>"
-                                                target="<?= esc_attr($logo['link']['target']); ?>"
+                                                <?= !empty($logo['link']['target']) ? 'target="' . esc_attr($logo['link']['target']) . '"' : '' ?>
                                                 class="logo__link">
                                             <?php endif; ?>
 
@@ -55,7 +55,7 @@ if (get_field('toggle_block')):
 
 
                                             <?php if ($has_link): ?>
-                                                <span><?= esc_html($logo['link']['title']) ?></span>
+                                                <span><?= esc_html($logo['link']['title'] ?? '') ?></span>
                                             </a>
                                         <?php endif; ?>
                                     </div>

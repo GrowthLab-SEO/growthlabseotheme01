@@ -42,7 +42,7 @@ if (get_field('toggle_block')):
                         if (isset($main_content) && !empty($main_content)):
                     ?>
                             <div class="contact-form__content formatted-text tx-center">
-                                <?= $main_content ?>
+                                <?= wp_kses_post($main_content ?? '') ?>
                             </div>
                     <?php
                         endif;
@@ -72,7 +72,7 @@ if (get_field('toggle_block')):
 
                             <?php if (isset($message_before_submit) && $message_before_submit): ?>
                                 <div class="form-box__message formatted-text tx-center flex-center">
-                                    <?= $message_before_submit ?>
+                                    <?= wp_kses_post($message_before_submit ?? '') ?>
                                 </div>
                             <?php endif; ?>
 

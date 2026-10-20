@@ -20,7 +20,7 @@ if (get_field('toggle_block')):
                     get_template_part('template-parts/ampersand', 'separator', array('classes' => 'locations__separator'));
                 }
                 if (isset($main_content) && $main_content) {
-                    echo $main_content;
+                    echo wp_kses_post($main_content);
                 }
                 ?>
             </div>
@@ -33,7 +33,7 @@ if (get_field('toggle_block')):
                             <div class="location-card__inner flex-center">
                                 <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                                 <div class="location-card__content tx-center">
-                                    <?= $first_card['content'] ?>
+                                    <?= wp_kses_post($first_card['content'] ?? '') ?>
                                 </div>
                             </div>
                         </div>
@@ -64,7 +64,7 @@ if (get_field('toggle_block')):
                                                 <div class="location-card__inner flex-center">
                                                     <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                                                     <div class="location-card__content tx-center">
-                                                        <?= $first_card['content'] ?>
+                                                        <?= wp_kses_post($first_card['content'] ?? '') ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -104,8 +104,8 @@ if (get_field('toggle_block')):
 
                 <?php // Standalone CTA unless the carousel navigation already prints it ?>
                 <?php if (!empty($cta_link['url']) && !(count($locations) > 1 && $locations_view_structure === "carousel")): ?>
-                    <a href="<?= esc_url($cta_link['url']) ?>" target="<?= esc_attr($cta_link['target']) ?>" class="cta-btn btn btn--secondary">
-                        <span><?= esc_html($cta_link['title']) ?></span>
+                    <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' : '' ?> class="cta-btn btn btn--secondary">
+                        <span><?= esc_html($cta_link['title'] ?? '') ?></span>
                     </a>
                 <?php endif; ?>
 

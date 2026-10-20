@@ -22,7 +22,7 @@ if (get_field('toggle_block')):
 
             <?php if ($text_content): ?>
                 <div class="content-box-grid__content formatted-text tx-center">
-                    <?= $text_content ?>
+                    <?= wp_kses_post($text_content ?? '') ?>
                 </div>
             <?php endif ?>
 
@@ -46,10 +46,10 @@ if (get_field('toggle_block')):
 
                                             <?php
                                             $title_html = $item_title;
-                                            if ($item_title_link) $title_html = "<a href='" . esc_url($item_title_link['url']) . "' target='" . esc_attr($item_title_link['target']) . "'>" . $item_title . "</a>";
+                                            if (!empty($item_title_link['url'])) $title_html = '<a href="' . esc_url($item_title_link['url']) . '"' . (!empty($item_title_link['target']) ? ' target="' . esc_attr($item_title_link['target']) . '"' : '') . '>' . $item_title . '</a>';
                                             print_title($title_html, $item['title_tag'] ?? 'p', "content-box__title");
                                             ?>
-                                            <?= $item_text_content; ?>
+                                            <?= wp_kses_post($item_text_content ?? '') ?>
 
                                         </div>
 

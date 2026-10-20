@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<aside role="complementary" class="sidebar <?= $args["classes"] ?>">
+<aside role="complementary" class="sidebar <?= esc_attr($args["classes"] ?? "") ?>">
 
     <?php dynamic_sidebar("sidebar-default" . (filterContentByLanguage() ? "-es" : "")) ?>
 
@@ -15,11 +15,11 @@ if (!defined('ABSPATH')) {
 
             <div class="widget widget--menu border-box tx-center">
                 <?php if (get_sub_field('menu_title')): ?>
-                    <p class="widget__title h4"><?= get_sub_field('menu_title') ?></p>
+                    <p class="widget__title h4"><?= wp_kses_post(get_sub_field('menu_title')) ?></p>
                     <?php get_template_part('template-parts/ampersand', 'separator', array('classes' => 'widget__separator')); ?>
                 <?php endif ?>
                 <?php if (get_sub_field('meu_text_content')): ?>
-                    <p class="widget__content formatted-text"><?= get_sub_field('meu_text_content') ?></p>
+                    <p class="widget__content formatted-text"><?= wp_kses_post(get_sub_field('meu_text_content')) ?></p>
                 <?php endif ?>
                 <?php the_sub_field('menu') ?>
             </div>
