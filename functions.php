@@ -283,6 +283,8 @@ function inline_main_critical_css()
         $mtimes[$file] = file_exists($file) ? filemtime($file) : 0;
     }
     $cache_key = 'growthlabseotheme01_critical_css_' . md5(serialize(array(
+        // This file builds the CSS, so changing it invalidates the cache too
+        @filemtime(__FILE__),
         $theme_uri,
         $mtimes,
         $block_files,
@@ -326,8 +328,9 @@ function inline_main_critical_css()
         $critical_css = preg_replace('/\{theme-path\}/', $theme_uri, $critical_css);
         // Minify CSS: remove comments, extra spaces, and newlines
         $critical_css = preg_replace('/\/\*.*?\*\//s', '', $critical_css); // Remove CSS comments
-        $critical_css = preg_replace('/\s/', ' ', $critical_css); // Replace multiple spaces with single space
-        $critical_css = preg_replace('/\s*([{}:;,])\s*/', '$1', $critical_css); // Remove spaces around braces, colons, semicolons, commas
+        $critical_css = preg_replace('/\s+/', ' ', $critical_css); // Collapse whitespace runs into one space
+        // Spaces around braces and semicolons are never significant; the ones around ":" and "," can be (".a :hover", strings)
+        $critical_css = preg_replace('/\s*([{};])\s*/', '$1', $critical_css);
         $critical_css = trim($critical_css); // Trim leading/trailing whitespace
 
         // An expiration keeps the transient out of the autoloaded options
