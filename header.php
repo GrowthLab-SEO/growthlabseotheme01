@@ -65,6 +65,7 @@ if (!defined('ABSPATH')) {
                     'container'          => 'nav',
                     'container_role'     => 'navigation',
                     'container_class' => 'main-nav',
+                    'container_id'    => 'site-navigation',
                     'menu_class'      => 'main-nav__menu',
                     'items_wrap'      => '<ul class="%2$s">%3$s</ul>',
                     'link_before'          => '<span>',
@@ -88,13 +89,13 @@ if (!defined('ABSPATH')) {
             ?>
 
                 <div class="site-header__navigation">
-                    <button class="mobile-menu-button" role="button" aria-label="<?= esc_attr(get_bilingual_text(__('Mobile Menu Button', 'growthlabseotheme01'), 'Botón del menú móvil')) ?>">
-                        <svg viewBox="0 0 24 24" width="24" height="24">
+                    <button type="button" class="mobile-menu-button" aria-expanded="false" aria-controls="site-navigation">
+                        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
                             <line x1="2" y1="4" x2="22" y2="4" />
                             <line x1="2" y1="12" x2="22" y2="12" />
                             <line x1="2" y1="20" x2="22" y2="20" />
                         </svg>
-                        <span><?= esc_html(get_bilingual_text(__('Mobile Menu Button', 'growthlabseotheme01'), 'Botón del menú móvil')) ?></span>
+                        <span><?= esc_html(get_bilingual_text(__('Menu', 'growthlabseotheme01'), 'Menú')) ?></span>
                     </button>
 
                     <?php wp_nav_menu($menu_args); ?>
