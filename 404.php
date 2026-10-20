@@ -5,15 +5,15 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<section class="404 bg-bicolor" style="padding-block: 200px;">
+<main id="main-content" class="not-found bg-bicolor" style="padding-block: 200px;">
 
     <div class="container">
 
         <p class="h1 tx-center">404:</p>
-        <p class="h2 tx-center">Page Not Found</p>
+        <h1 class="h2 tx-center"><?= esc_html(get_bilingual_text(__('Page Not Found', 'growthlabseotheme01'), 'Página no encontrada')) ?></h1>
 
     </div>
 
-</section>
+</main>
 
 <?php get_footer() ?>
