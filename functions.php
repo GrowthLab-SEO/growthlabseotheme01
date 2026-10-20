@@ -626,52 +626,40 @@ add_action('customize_controls_print_footer_scripts', function () {
 
 
 // Add dynamic versioning to theme scripts and styles
-add_filter('script_loader_src', 'add_dynamic_version_to_theme_scripts', 10, 2);
-add_filter('style_loader_src', 'add_dynamic_version_to_theme_styles', 10, 2);
+add_filter('script_loader_src', 'add_dynamic_version_to_theme_assets', 10, 2);
+add_filter('style_loader_src', 'add_dynamic_version_to_theme_assets', 10, 2);
 
-function add_dynamic_version_to_theme_scripts($src, $handle)
+/**
+ * Sets ?ver= to the file's mtime for scripts and styles served from the theme directory, or from the active child
+ * theme directory when there is one, so browsers only re-download them when they change.
+ *
+ * @param string $src    Asset URL.
+ * @param string $handle Asset handle.
+ * @return string
+ */
+function add_dynamic_version_to_theme_assets($src, $handle)
 {
-    $theme_dir_uri = get_template_directory_uri();
-
-    // Remove scheme for comparison
-    $src_normalized = preg_replace('(^https?:)', '', $src);
-    $theme_dir_normalized = preg_replace('(^https?:)', '', $theme_dir_uri);
-
-    if (strpos($src_normalized, $theme_dir_normalized) === 0) {
-        // Extract path without query string
-        $path_parts = parse_url($src);
-        $path = $path_parts['path'] ?? '';
-
-        // Remove the theme directory from path to get relative path
-        $relative_path = str_replace(parse_url($theme_dir_uri, PHP_URL_PATH), '', $path);
-        $file_path = get_template_directory() . $relative_path;
-
-        if (file_exists($file_path)) {
-            $version = filemtime($file_path);
-            // Remove existing ver parameter and add new one
-            $src = remove_query_arg('ver', $src);
-            $src = add_query_arg('ver', $version, $src);
-        }
+    // Child theme first: its directory name usually starts with the parent's, so the parent prefix would match it too
+    $theme_dirs = array();
+    if (get_stylesheet_directory() !== get_template_directory()) {
+        $theme_dirs[get_stylesheet_directory_uri()] = get_stylesheet_directory();
     }
-    return $src;
-}
-
-function add_dynamic_version_to_theme_styles($src, $handle)
-{
-    $theme_dir_uri = get_template_directory_uri();
+    $theme_dirs[get_template_directory_uri()] = get_template_directory();
 
     // Remove scheme for comparison
     $src_normalized = preg_replace('(^https?:)', '', $src);
-    $theme_dir_normalized = preg_replace('(^https?:)', '', $theme_dir_uri);
 
-    if (strpos($src_normalized, $theme_dir_normalized) === 0) {
+    foreach ($theme_dirs as $theme_dir_uri => $theme_dir) {
+        $theme_dir_normalized = preg_replace('(^https?:)', '', $theme_dir_uri);
+        if (strpos($src_normalized, $theme_dir_normalized . '/') !== 0) continue;
+
         // Extract path without query string
         $path_parts = parse_url($src);
         $path = $path_parts['path'] ?? '';
 
         // Remove the theme directory from path to get relative path
         $relative_path = str_replace(parse_url($theme_dir_uri, PHP_URL_PATH), '', $path);
-        $file_path = get_template_directory() . $relative_path;
+        $file_path = $theme_dir . $relative_path;
 
         if (file_exists($file_path)) {
             $version = filemtime($file_path);
@@ -679,6 +667,7 @@ function add_dynamic_version_to_theme_styles($src, $handle)
             $src = remove_query_arg('ver', $src);
             $src = add_query_arg('ver', $version, $src);
         }
+        break;
     }
     return $src;
 }
