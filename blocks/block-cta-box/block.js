@@ -3,7 +3,7 @@ const contactFormFooterWrapper = document.querySelector(
   ".contact-form-footer__wrapper",
 );
 
-const positionedBoxes = new WeakSet();
+let positionedBoxes = new WeakSet();
 
 function positionCTABox(element) {
   if (positionedBoxes.has(element)) return;
@@ -105,7 +105,8 @@ window.addEventListener(
       });
 
       // WRITE PHASE afterwards
-      positionedBoxes.clear();
+      // WeakSet has no clear(), so start a fresh one to reposition every box
+      positionedBoxes = new WeakSet();
       visible.forEach((element) => positionCTABox(element));
     }, 150);
   },
