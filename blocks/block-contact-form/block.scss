@@ -2,6 +2,7 @@
 @use "../../styles/globals/mixins" as m;
 
 section:has(+ .contact-form--side-pic),
+section:has(+ main > .contact-form--side-pic:first-child),
 main:has(+ .contact-form--side-pic) {
   padding-bottom: var(--sp-lg);
 }

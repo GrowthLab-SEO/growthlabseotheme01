@@ -15,7 +15,7 @@ $options = get_field_options('options' . $es);
 
     <div class="blog__wrapper container">
 
-        <main role="main" class="blog__main border-box">
+        <main id="main-content" role="main" class="blog__main border-box">
 
             <?php if (!have_posts()): ?>
                 <p class="blog__no-results"><?= esc_html(get_bilingual_text(__('No results found. Try a different search.', 'growthlabseotheme01'), 'No se encontraron resultados. Intenta con otra búsqueda.')) ?></p>

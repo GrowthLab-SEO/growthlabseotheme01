@@ -733,3 +733,40 @@ iframe {
     height: 500px;
   }
 }
+
+// Visually hidden text that stays available to screen readers (WordPress core pattern)
+.screen-reader-text {
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  border: 0;
+  word-wrap: normal !important;
+}
+
+// The skip link shows up when it gets keyboard focus
+.skip-link.screen-reader-text:focus {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 1.2rem 2rem;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100001;
+  display: block;
+  clip: auto;
+  clip-path: none;
+  background-color: rgb(var(--secondary-light));
+  color: rgb(var(--primary-dark));
+  font-family: var(--font-primary);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-decoration: none;
+  outline: 2px solid rgb(var(--tertiary));
+  outline-offset: 2px;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
+}

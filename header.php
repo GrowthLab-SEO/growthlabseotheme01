@@ -19,6 +19,8 @@ if (!defined('ABSPATH')) {
 
     <?php wp_body_open(); ?>
 
+    <a class="skip-link screen-reader-text" href="#main-content"><?= esc_html(get_bilingual_text(__('Skip to content', 'growthlabseotheme01'), 'Saltar al contenido')) ?></a>
+
     <?php
     $es = filterContentByLanguage() ? '_es' : '';
     $options = get_field_options('options' . $es);
