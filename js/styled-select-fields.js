@@ -1,11 +1,8 @@
 const styledSelectSelector =
   "select:not(.posts-filters__select):not([multiple]):not(.styled-select-field)";
-// Fallback label for selects without a label or selected text (site is EN/ES).
-const styledSelectPlaceholder = document.documentElement.lang
-  .toLowerCase()
-  .startsWith("es")
-  ? "Selecciona una opción"
-  : "Select an option";
+// Fallback label for selects without a label or selected text, in the language of the page (see functions.php)
+const styledSelectPlaceholder =
+  (window.styledSelectData && window.styledSelectData.placeholder) || "Select an option";
 let openStyledSelect = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -249,18 +246,20 @@ function createStyledSelect(select) {
       searchTimer = window.setTimeout(() => {
         searchText = "";
       }, 700);
+      // Look for the next enabled option starting with the typed text, after the active one and wrapping around
       const start = activeIndex >= 0 ? activeIndex + 1 : 0;
-      const match = options.find((option, offset) => {
-        const candidate = options[(start + offset) % options.length];
-        return (
+      for (let offset = 0; offset < options.length; offset++) {
+        const index = (start + offset) % options.length;
+        const candidate = options[index];
+        if (
           !candidate.disabled &&
           candidate.element.textContent.toLocaleLowerCase().startsWith(searchText)
-        );
-      });
-      if (match) {
-        event.preventDefault();
-        if (!isOpen) openMenu();
-        setActive(options.indexOf(match));
+        ) {
+          event.preventDefault();
+          if (!isOpen) openMenu();
+          setActive(index);
+          break;
+        }
       }
     }
   });

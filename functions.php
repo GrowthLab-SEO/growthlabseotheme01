@@ -389,6 +389,9 @@ function growthlabseotheme01_scripts()
         true
     );
     wp_script_add_data('growthlabseotheme01-styled-select-fields', 'strategy', 'defer');
+    wp_localize_script('growthlabseotheme01-styled-select-fields', 'styledSelectData', [
+        'placeholder' => get_bilingual_text(__('Select an option', 'growthlabseotheme01'), 'Selecciona una opción'),
+    ]);
 
     // Picture Optimization scripts.
     if (file_exists(get_template_directory() . '/js/picture-optimization-min.js')) {
