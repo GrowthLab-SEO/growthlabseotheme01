@@ -62,6 +62,13 @@ if (!function_exists('filterContentByLanguage')) {
     }
 }
 
+// The /es/ URL prefix switches content to Spanish without changing the WordPress locale, so language_attributes()
+// would still print the site language there. Use "es" on Spanish pages.
+add_filter('language_attributes', function ($output) {
+    if (!filterContentByLanguage()) return $output;
+    return preg_replace('/lang="[^"]*"/', 'lang="es"', $output);
+});
+
 //Phone number format remover
 function get_flat_number($phone)
 {
