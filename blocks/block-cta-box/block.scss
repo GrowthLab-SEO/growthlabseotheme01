@@ -297,3 +297,23 @@
     }
   }
 }
+
+// A float CTA that is the last block of <main> borders the footer, which is the next sibling of <main>
+main:has(> .cta-box.float:last-child) + .site-footer {
+  margin-top: 0;
+  padding-top: 0;
+  transition:
+    margin-top 0.2s ease,
+    padding-top 0.2s ease;
+
+  .contact-form-footer {
+    &__wrapper {
+      margin-top: 0;
+      transition: padding-top 0.2s ease;
+    }
+
+    &__inner {
+      margin-top: 0;
+    }
+  }
+}

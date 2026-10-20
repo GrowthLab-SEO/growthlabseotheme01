@@ -19,8 +19,11 @@ function positionCTABox(element) {
   const bottomPosition = boxHeight * 0.5;
 
   const firstChild = element.firstElementChild;
-  const prevSibling = element.previousElementSibling;
-  const nextSibling = element.nextElementSibling;
+  // Blocks of full width pages sit inside <main>: the first/last block borders the hero/footer outside it
+  const container = element.parentElement;
+  const inMain = container?.tagName === "MAIN";
+  const prevSibling = element.previousElementSibling || (inMain ? container.previousElementSibling : null);
+  const nextSibling = element.nextElementSibling || (inMain ? container.nextElementSibling : null);
   const isFooter = nextSibling?.classList.contains("site-footer");
 
   // WRITE PHASE — everything inside the rAF
