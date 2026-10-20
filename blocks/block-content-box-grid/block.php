@@ -46,7 +46,7 @@ if (get_field('toggle_block')):
 
                                             <?php
                                             $title_html = $item_title;
-                                            if (!empty($item_title_link['url'])) $title_html = '<a href="' . esc_url($item_title_link['url']) . '"' . (!empty($item_title_link['target']) ? ' target="' . esc_attr($item_title_link['target']) . '"' : '') . '>' . $item_title . '</a>';
+                                            if (!empty($item_title_link['url'])) $title_html = '<a href="' . esc_url($item_title_link['url']) . '"' . (!empty($item_title_link['target']) ? ' target="' . esc_attr($item_title_link['target']) . '"' . ($item_title_link['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '') . '>' . $item_title . '</a>';
                                             print_title($title_html, $item['title_tag'] ?? 'p', "content-box__title");
                                             ?>
                                             <?= wp_kses_post($item_text_content ?? '') ?>
@@ -68,7 +68,7 @@ if (get_field('toggle_block')):
                     ?>
 
                         <li class="content-box content-box--menu-item">
-                            <a href="<?= esc_url($menu_item->url) ?>" target="<?= esc_attr($menu_item->target) ?>" class="content-box__wrapper">
+                            <a href="<?= esc_url($menu_item->url) ?>"<?= $menu_item->target ? ' target="' . esc_attr($menu_item->target) . '"' . ($menu_item->target === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="content-box__wrapper">
                                 <div class="content-box__inner">
 
                                     <div class="content-box__content formatted-text">

@@ -36,7 +36,7 @@ if (!$bg_mobile) $bg_mobile = [];
 
                     <?php if (!empty($cta_button['url'])): ?>
                         <div class="content-box__btn">
-                            <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' : '' ?> class="btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
+                            <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' . ($cta_button['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
 
                                 <span><?= esc_html($cta_button['title'] ?? '') ?>
 

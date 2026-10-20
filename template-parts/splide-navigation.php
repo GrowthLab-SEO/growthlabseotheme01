@@ -24,7 +24,7 @@
      </button>
 
      <?php if (!empty($args['nav_link']['url'])): ?>
-         <a href="<?= esc_url($args['nav_link']['url']) ?>"<?= !empty($args['nav_link']['target']) ? ' target="' . esc_attr($args['nav_link']['target']) . '"' : '' ?> class="cta-btn btn btn--secondary" aria-label="<?= esc_attr($args['nav_link']['title'] ?? '') ?>">
+         <a href="<?= esc_url($args['nav_link']['url']) ?>"<?= !empty($args['nav_link']['target']) ? ' target="' . esc_attr($args['nav_link']['target']) . '"' . ($args['nav_link']['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="cta-btn btn btn--secondary" aria-label="<?= esc_attr($args['nav_link']['title'] ?? '') ?>">
              <span><?= esc_html($args['nav_link']['title'] ?? '') ?></span>
          </a>
      <?php endif ?>

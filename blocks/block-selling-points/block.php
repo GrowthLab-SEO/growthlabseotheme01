@@ -49,7 +49,7 @@ if (get_field('toggle_block')):
 
                                                 <?php
                                                 $title_html = !empty($item['link']['url'])
-                                                    ? '<a href="' . esc_url($item['link']['url']) . '"' . (!empty($item['link']['target']) ? ' target="' . esc_attr($item['link']['target']) . '"' : '') . ' class="item-card__link">' . $item_title . '</a>'
+                                                    ? '<a href="' . esc_url($item['link']['url']) . '"' . (!empty($item['link']['target']) ? ' target="' . esc_attr($item['link']['target']) . '"' . ($item['link']['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '') . ' class="item-card__link">' . $item_title . '</a>'
                                                     : $item_title;
                                                 print_title($title_html, $item['title_tag'] ?? 'p', "item-card__title");
                                                 ?>

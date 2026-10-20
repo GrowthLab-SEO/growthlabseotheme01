@@ -163,7 +163,7 @@
           }
           ?>
 
-          <a href="https://growthlabseo.com/" target="_blank" class="copyright-footer__logo">
+          <a href="https://growthlabseo.com/" target="_blank" rel="noopener noreferrer" class="copyright-footer__logo">
             <img src="<?= esc_url(get_template_directory_uri() . "/assets/img/Growth-Lab-Logo.png") ?>" alt="Growth Lab SEO Logo" width="270" height="50">
           </a>
 

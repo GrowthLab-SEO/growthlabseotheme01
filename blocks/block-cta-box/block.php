@@ -56,7 +56,7 @@ if (get_field('toggle_block')):
 
                         <?php if (!empty($cta_link['url'])): ?>
                             <div class="cta-box__btn">
-                                <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' : '' ?> class="btn btn--tertiary btn--arrow">
+                                <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' . ($cta_link['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="btn btn--tertiary btn--arrow">
 
                                     <span><?= esc_html($cta_link['title'] ?? '') ?>
 

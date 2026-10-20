@@ -104,7 +104,7 @@ if (get_field('toggle_block')):
 
                 <?php // Standalone CTA unless the carousel navigation already prints it ?>
                 <?php if (!empty($cta_link['url']) && !(count($locations) > 1 && $locations_view_structure === "carousel")): ?>
-                    <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' : '' ?> class="cta-btn btn btn--secondary">
+                    <a href="<?= esc_url($cta_link['url']) ?>"<?= !empty($cta_link['target']) ? ' target="' . esc_attr($cta_link['target']) . '"' . ($cta_link['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="cta-btn btn btn--secondary">
                         <span><?= esc_html($cta_link['title'] ?? '') ?></span>
                     </a>
                 <?php endif; ?>

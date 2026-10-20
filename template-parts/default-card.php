@@ -10,6 +10,9 @@ $tag = ($args["tag"] ?? '') ?: (($options['posts_default_title_tag'] ?? null) ?:
 
 // The Spanish options fall back to the English default image when they have none
 $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options('options')['posts_default_image'] ?? null);
+
+$args["link_target"] = ($args["link_target"] ?? "") ?: "_self";
+$link_rel = $args["link_target"] === "_blank" ? ' rel="noopener noreferrer"' : '';
 ?>
 
 <div class="default-card <?= esc_attr($args["classes"] ?? '') ?>">
@@ -17,7 +20,7 @@ $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options
 
         <?php
         if ($args['link_url'] && $args['link_url'] !== '') {
-            echo '<a href="' . esc_url($args['link_url']) . '" class="default-card__pic-wrapper" target="' . esc_attr($args['link_target']) . '" aria-label="' . esc_attr($args['title']) . '">';
+            echo '<a href="' . esc_url($args['link_url']) . '" class="default-card__pic-wrapper" target="' . esc_attr($args['link_target']) . '"' . $link_rel . ' aria-label="' . esc_attr($args['title']) . '">';
         } else {
             echo '<div class="default-card__pic-wrapper">';
         }
@@ -43,7 +46,7 @@ $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options
 
             <?php if ($args['link_url'] && $args['link_url'] !== ''): ?>
                 <div class="default-card__btn">
-                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>" class="btn btn--secondary" aria-label="Read More">
+                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>"<?= $link_rel ?> class="btn btn--secondary" aria-label="Read More">
                         <span>Read More</span>
                     </a>
                 </div>

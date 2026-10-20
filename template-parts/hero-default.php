@@ -31,7 +31,7 @@ if (!$bg_mobile) $bg_mobile = [];
             ?>
 
             <?php if (!empty($cta_button['url'])): ?>
-                <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' : '' ?> class="hero__btn btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
+                <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' . ($cta_button['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="hero__btn btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
 
                     <span><?= esc_html($cta_button['title'] ?? '') ?>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

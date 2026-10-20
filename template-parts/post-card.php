@@ -11,13 +11,16 @@ $tag = ($args["tag"] ?? '') ?: (($options['posts_default_title_tag'] ?? null) ?:
 // The Spanish options fall back to the English default image when they have none
 $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options('options')['posts_default_image'] ?? null);
 
+$args["link_target"] = ($args["link_target"] ?? "") ?: "_self";
+$link_rel = $args["link_target"] === "_blank" ? ' rel="noopener noreferrer"' : '';
+
 ?>
 <article class="post-card <?= esc_attr($args["classes"] ?? '') ?>">
     <div class="post-card__wrapper">
 
         <?php
         if ($args['link_url']) {
-            echo '<a href="' . esc_url($args['link_url']) . '" class="post-card__pic-wrapper" target="' . esc_attr($args['link_target']) . '" aria-label="' . esc_attr($args['title']) . '">';
+            echo '<a href="' . esc_url($args['link_url']) . '" class="post-card__pic-wrapper" target="' . esc_attr($args['link_target']) . '"' . $link_rel . ' aria-label="' . esc_attr($args['title']) . '">';
         } else {
             echo '<div class="post-card__pic-wrapper">';
         }
@@ -45,7 +48,7 @@ $default_image = ($options['posts_default_image'] ?? null) ?: (get_field_options
 
             <?php if ($args['link_url']): ?>
                 <div class="post-card__btn">
-                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>" class="btn btn--secondary" aria-label="Read More">
+                    <a href="<?= esc_url($args['link_url']) ?>" target="<?= esc_attr($args['link_target']) ?>"<?= $link_rel ?> class="btn btn--secondary" aria-label="Read More">
                         <span>Read More</span>
                     </a>
                 </div>

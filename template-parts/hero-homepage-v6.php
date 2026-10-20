@@ -47,12 +47,12 @@ if (!$bg_mobile) $bg_mobile = [];
 
                     <div class="content-box__btn">
                         <?php if (!empty($cta_button['url'])): ?>
-                            <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' : '' ?> class="btn btn--secondary" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
+                            <a href="<?= esc_url($cta_button['url']) ?>"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' . ($cta_button['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="btn btn--secondary" aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
                                 <span><?= esc_html($cta_button['title'] ?? '') ?></span>
                             </a>
                         <?php endif ?>
                         <?php if (!empty($cta_button_2['url'])): ?>
-                            <a href="<?= esc_url($cta_button_2['url']) ?>"<?= !empty($cta_button_2['target']) ? ' target="' . esc_attr($cta_button_2['target']) . '"' : '' ?> class="btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button_2['title'] ?? '') ?>">
+                            <a href="<?= esc_url($cta_button_2['url']) ?>"<?= !empty($cta_button_2['target']) ? ' target="' . esc_attr($cta_button_2['target']) . '"' . ($cta_button_2['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> class="btn btn--tertiary btn--arrow" aria-label="<?= esc_attr($cta_button_2['title'] ?? '') ?>">
                                 <span>
                                     <?= esc_html($cta_button_2['title'] ?? '') ?>
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

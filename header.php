@@ -101,7 +101,7 @@ if (!defined('ABSPATH')) {
 
             <?php if (!empty($cta_button['url'])): ?>
                 <div class="site-header__cta">
-                    <a href="<?= esc_url($cta_button['url']) ?>" class="cta-button btn btn--tertiary btn--arrow"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' : '' ?> aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
+                    <a href="<?= esc_url($cta_button['url']) ?>" class="cta-button btn btn--tertiary btn--arrow"<?= !empty($cta_button['target']) ? ' target="' . esc_attr($cta_button['target']) . '"' . ($cta_button['target'] === '_blank' ? ' rel="noopener noreferrer"' : '') : '' ?> aria-label="<?= esc_attr($cta_button['title'] ?? '') ?>">
 
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-button__icon">
                             <g clip-path="url(#clip0_4184_2633)">
