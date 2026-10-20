@@ -76,6 +76,25 @@ function get_flat_number($phone)
     return preg_replace("/[^0-9]/", '', $phone);
 }
 
+// tel: URL for a phone number. US numbers get the +1 country code once, whether or not the number already includes it;
+// numbers written with another international prefix (+52...) keep it. Returns '' when there are no digits.
+if (!function_exists('get_phone_href')) {
+    function get_phone_href($phone)
+    {
+        $digits = get_flat_number($phone);
+        if (!$digits) return '';
+
+        if (strlen($digits) === 10) {
+            $digits = '1' . $digits;
+        } elseif (!(strlen($digits) === 11 && $digits[0] === '1') && !str_starts_with(ltrim((string) $phone), '+')) {
+            // Not a US number and no international prefix: dial it as written
+            return esc_url('tel:' . $digits, array('tel'));
+        }
+
+        return esc_url('tel:+' . $digits, array('tel'));
+    }
+}
+
 // Wraps a title in a heading/paragraph tag. The tag is limited to a safe list (falling back to h1 for
 // hero titles and p otherwise) and the title keeps only post-safe HTML, so ACF values can't inject scripts.
 if (!function_exists('get_wrapped_title')) {
@@ -493,7 +512,7 @@ function phonenumber($atts, $content = null)
 
     $link = sprintf(
         '<a href="%s" target="%s"%s%s>%s</a>',
-        esc_url('tel:+1' . $link_number, array('tel')),
+        get_phone_href($link_text),
         esc_attr($target),
         $target === '_blank' ? ' rel="noopener"' : '',
         $wrapper ? '' : $id_class,
