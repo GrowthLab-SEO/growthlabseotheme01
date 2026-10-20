@@ -148,14 +148,17 @@ if (!defined('ABSPATH')) {
     </header>
 
     <?php
-    $hero_title = get_page_field("hero_properties")["hero_title"] ?? null;
+    $hero_properties = get_page_field("hero_properties") ?: [];
+    $hero_title = $hero_properties["hero_title"] ?? null;
 
     if (empty($hero_title)) {
+        // The fallback title (page, term, archive or search title) is the page heading
         $hero_title = get_page_hero_title();
+        $hero_title_tag = "h1";
+    } else {
+        // Editors can choose another tag for a custom title (SEO or styling); print_title() validates it
+        $hero_title_tag = $hero_properties["hero_title_tag"] ?? "h1";
     }
-
-    // The hero title is the page heading
-    $hero_title_tag = "h1";
 
     $args = array(
         "hero_title" => $hero_title,
