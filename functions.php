@@ -119,29 +119,29 @@ if (!function_exists('growthlabseotheme01_setup')) {
         // Add custom image sizes to the media selector
         add_filter('image_size_names_choose', function ($sizes) {
             return array_merge([
-                'thumbnail'    => __('Miniatura'),
-                'medium'       => __('Mediano'),
-                'large'        => __('Grande'),
-                'full'         => __('Tamaño completo'),
-                'cover-desktop'  => __('Cover Desktop (1920×1080)'),
-                'cover-tablet'   => __('Cover Tablet (1280x960)'),
-                'cover-mobile'   => __('Cover Mobile (768×432)'),
-                'cover-tablet-portrait'   => __('Cover Tablet (960x1280)'),
-                'cover-mobile-portrait'   => __('Cover Mobile (768×1100)'),
-                'content'   => __('Contenido (800×600)'),
-                'featured-small' => __('Featured Small (480×360)'),
+                'thumbnail'    => __('Thumbnail'),
+                'medium'       => __('Medium'),
+                'large'        => __('Large'),
+                'full'         => __('Full Size'),
+                'cover-desktop'  => __('Cover Desktop (1920×1080)', 'growthlabseotheme01'),
+                'cover-tablet'   => __('Cover Tablet (1280x960)', 'growthlabseotheme01'),
+                'cover-mobile'   => __('Cover Mobile (768×432)', 'growthlabseotheme01'),
+                'cover-tablet-portrait'   => __('Cover Tablet (960x1280)', 'growthlabseotheme01'),
+                'cover-mobile-portrait'   => __('Cover Mobile (768×1100)', 'growthlabseotheme01'),
+                'content'   => __('Content (800×600)', 'growthlabseotheme01'),
+                'featured-small' => __('Featured Small (480×360)', 'growthlabseotheme01'),
             ], $sizes);
         });
 
         // Register Navigation Menus
         register_nav_menus(
             array(
-                'main' => esc_html__('Main Menu', get_text_domain())
+                'main' => esc_html__('Main Menu', 'growthlabseotheme01')
             )
         );
         register_nav_menus(
             array(
-                'main_es' => esc_html__('Main Menu Spanish', get_text_domain())
+                'main_es' => esc_html__('Main Menu Spanish', 'growthlabseotheme01')
             )
         );
     }
@@ -159,16 +159,16 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
     $data['settings']['spacing']['defaultSpacingSizes'] = false;
 
     $data['settings']['color']['palette'] = [
-        ['name' => __('Primary Color', get_text_domain()), 'slug' => 'primary-color', 'color' => get_theme_mod('primary_color', $default_colors['primary']['default'])],
-        ['name' => __('Primary Color Dark', get_text_domain()), 'slug' => 'primary-color-dark', 'color' => get_theme_mod('primary_color_dark', $default_colors['primary']['dark'])],
-        ['name' => __('Primary Color Light', get_text_domain()), 'slug' => 'primary-color-light', 'color' => get_theme_mod('primary_color_light', $default_colors['primary']['light'])],
-        ['name' => __('Secondary Color', get_text_domain()), 'slug' => 'secondary-color', 'color' => get_theme_mod('secondary_color', $default_colors['secondary']['default'])],
-        ['name' => __('Secondary Color Dark', get_text_domain()), 'slug' => 'secondary-color-dark', 'color' => get_theme_mod('secondary_color_dark', $default_colors['secondary']['dark'])],
-        ['name' => __('Secondary Color Light', get_text_domain()), 'slug' => 'secondary-color-light', 'color' => get_theme_mod('secondary_color_light', $default_colors['secondary']['light'])],
-        ['name' => __('Tertiary Color', get_text_domain()), 'slug' => 'tertiary-color', 'color' => get_theme_mod('tertiary_color', $default_colors['tertiary']['default'])],
-        ['name' => __('Tertiary Color Dark', get_text_domain()), 'slug' => 'tertiary-color-dark', 'color' => get_theme_mod('tertiary_color_dark', $default_colors['tertiary']['dark'])],
-        ['name' => __('Tertiary Color Light', get_text_domain()), 'slug' => 'tertiary-color-light', 'color' => get_theme_mod('tertiary_color_light', $default_colors['tertiary']['light'])],
-        ['name' => __('Text Color', get_text_domain()), 'slug' => 'text-color', 'color' => get_theme_mod('text_color', $default_colors['text'])],
+        ['name' => __('Primary Color', 'growthlabseotheme01'), 'slug' => 'primary-color', 'color' => get_theme_mod('primary_color', $default_colors['primary']['default'])],
+        ['name' => __('Primary Color Dark', 'growthlabseotheme01'), 'slug' => 'primary-color-dark', 'color' => get_theme_mod('primary_color_dark', $default_colors['primary']['dark'])],
+        ['name' => __('Primary Color Light', 'growthlabseotheme01'), 'slug' => 'primary-color-light', 'color' => get_theme_mod('primary_color_light', $default_colors['primary']['light'])],
+        ['name' => __('Secondary Color', 'growthlabseotheme01'), 'slug' => 'secondary-color', 'color' => get_theme_mod('secondary_color', $default_colors['secondary']['default'])],
+        ['name' => __('Secondary Color Dark', 'growthlabseotheme01'), 'slug' => 'secondary-color-dark', 'color' => get_theme_mod('secondary_color_dark', $default_colors['secondary']['dark'])],
+        ['name' => __('Secondary Color Light', 'growthlabseotheme01'), 'slug' => 'secondary-color-light', 'color' => get_theme_mod('secondary_color_light', $default_colors['secondary']['light'])],
+        ['name' => __('Tertiary Color', 'growthlabseotheme01'), 'slug' => 'tertiary-color', 'color' => get_theme_mod('tertiary_color', $default_colors['tertiary']['default'])],
+        ['name' => __('Tertiary Color Dark', 'growthlabseotheme01'), 'slug' => 'tertiary-color-dark', 'color' => get_theme_mod('tertiary_color_dark', $default_colors['tertiary']['dark'])],
+        ['name' => __('Tertiary Color Light', 'growthlabseotheme01'), 'slug' => 'tertiary-color-light', 'color' => get_theme_mod('tertiary_color_light', $default_colors['tertiary']['light'])],
+        ['name' => __('Text Color', 'growthlabseotheme01'), 'slug' => 'text-color', 'color' => get_theme_mod('text_color', $default_colors['text'])],
     ];
 
     $font_primary = get_theme_mod('font_primary', $default_fonts['primary']);
@@ -447,9 +447,9 @@ function growthlabseotheme01_widgets_init()
 
     register_sidebar(
         array(
-            'name'          => esc_html__('Default Sidebar', get_text_domain()),
+            'name'          => esc_html__('Default Sidebar', 'growthlabseotheme01'),
             'id'            => 'sidebar-default',
-            'description'   => esc_html__('Add widgets here to appear in the page sidebar.', get_text_domain()),
+            'description'   => esc_html__('Add widgets here to appear in the page sidebar.', 'growthlabseotheme01'),
             'before_widget' => '<div id="%1$s" class="widget %2$s">',
             'after_widget'  => '</div>',
             'before_title'  => '<p class="widget-title">',
@@ -459,9 +459,9 @@ function growthlabseotheme01_widgets_init()
 
     register_sidebar(
         array(
-            'name'          => esc_html__('Blog Sidebar', get_text_domain()),
+            'name'          => esc_html__('Blog Sidebar', 'growthlabseotheme01'),
             'id'            => 'sidebar-blog',
-            'description'   => esc_html__('Add widgets here to appear in the Blog sidebar.', get_text_domain()),
+            'description'   => esc_html__('Add widgets here to appear in the Blog sidebar.', 'growthlabseotheme01'),
             'before_widget' => '<div id="%1$s" class="widget %2$s">',
             'after_widget'  => '</div>',
             'before_title'  => '<p class="widget-title">',
@@ -471,9 +471,9 @@ function growthlabseotheme01_widgets_init()
 
     register_sidebar(
         array(
-            'name'          => esc_html__('Default Sidebar Spanish', get_text_domain()),
+            'name'          => esc_html__('Default Sidebar Spanish', 'growthlabseotheme01'),
             'id'            => 'sidebar-default-es',
-            'description'   => esc_html__('Add widgets here to appear in the page Spanish sidebar.', get_text_domain()),
+            'description'   => esc_html__('Add widgets here to appear in the page Spanish sidebar.', 'growthlabseotheme01'),
             'before_widget' => '<div id="%1$s" class="widget %2$s">',
             'after_widget'  => '</div>',
             'before_title'  => '<p class="widget-title">',
@@ -483,9 +483,9 @@ function growthlabseotheme01_widgets_init()
 
     register_sidebar(
         array(
-            'name'          => esc_html__('Blog Sidebar Spanish', get_text_domain()),
+            'name'          => esc_html__('Blog Sidebar Spanish', 'growthlabseotheme01'),
             'id'            => 'sidebar-blog-es',
-            'description'   => esc_html__('Add widgets here to appear in the Blog Spanish sidebar.', get_text_domain()),
+            'description'   => esc_html__('Add widgets here to appear in the Blog Spanish sidebar.', 'growthlabseotheme01'),
             'before_widget' => '<div id="%1$s" class="widget %2$s">',
             'after_widget'  => '</div>',
             'before_title'  => '<p class="widget-title">',

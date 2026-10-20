@@ -15,7 +15,7 @@ if (!function_exists('theme_blocks_category')) {
             array(
                 array(
                     'slug'  => $theme_slug . '-blocks',
-                    'title' => __($theme_name . ' Blocks', $theme_slug),
+                    'title' => sprintf(__('%s Blocks', 'growthlabseotheme01'), $theme_name),
                 )
             )
         );
