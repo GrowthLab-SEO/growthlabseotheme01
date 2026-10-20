@@ -39,7 +39,7 @@ add_filter('mce_external_plugins', function ($plugins) {
 function my_acf_editor_styles($mce_css)
 {
     $editor_style = get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css';
-    $editor_style .= '?ver=' . time();
+    $editor_style .= '?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css');
 
     if (!empty($mce_css)) {
         $mce_css .= ',' . $editor_style;
@@ -143,7 +143,7 @@ add_filter('tiny_mce_before_init', 'my_wp_editor_colors_direct', 10);
 // 7️⃣ Configure WordPress editor with same fonts and sizes
 function my_wp_editor_formats()
 {
-    add_editor_style(get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css?ver=' . time());
+    add_editor_style(get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css'));
 
     // Add support for custom formats
     add_theme_support('editor-color-palette', array(
