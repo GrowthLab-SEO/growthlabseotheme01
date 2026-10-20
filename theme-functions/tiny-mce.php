@@ -30,6 +30,48 @@ if (!function_exists('_theme_get_tinymce_color_map')) {
     }
 }
 
+/**
+ * Internal helper — builds the font_formats string for TinyMCE (same as theme-02/03).
+ *
+ * Order: theme fonts (theme.json) → custom fonts (Font Library) → system, so the fonts chosen in the
+ * Customizer and the ones installed from the Font Library can be used in WYSIWYG fields too.
+ */
+if (!function_exists('_theme_get_tinymce_font_formats')) {
+    function _theme_get_tinymce_font_formats(): string
+    {
+        $entries = [];
+        $seen    = [];
+
+        if (class_exists('WP_Theme_JSON_Resolver')) {
+            $settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+            $families = $settings['typography']['fontFamilies'] ?? [];
+
+            foreach (['theme', 'custom'] as $source) {
+                foreach (($families[$source] ?? []) as $font) {
+                    $name   = $font['name'] ?? '';
+                    $family = $font['fontFamily'] ?? $name;
+                    if (! $name || isset($seen[$name])) {
+                        continue;
+                    }
+
+                    $seen[$name] = true;
+                    $entries[] = $name . '=' . str_replace('"', '', $family);
+                }
+            }
+        }
+
+        if (empty($entries)) {
+            $entries[] = 'Open Sans=Open Sans,sans-serif';
+            $entries[] = 'Fraunces=Fraunces,serif';
+        }
+
+        $entries[] = 'Arial=Arial,Helvetica,sans-serif';
+        $entries[] = 'Times New Roman=Times New Roman,Times,serif';
+
+        return implode(';', $entries);
+    }
+}
+
 add_filter('mce_external_plugins', function ($plugins) {
     $plugins['lineheight'] = get_template_directory_uri() . '/js/vendor/tiny-mce/lineheight-min.js';
     return $plugins;
@@ -54,7 +96,7 @@ add_filter('mce_css', 'my_acf_editor_styles');
 // 2️⃣ TinyMCE configuration - For standard WordPress
 function my_acf_wysiwyg_custom_settings($init)
 {
-    $init['font_formats'] = 'Open Sans=Open Sans,sans-serif;Fraunces=Fraunces,serif;Arial=Arial,Helvetica,sans-serif;Times New Roman=Times New Roman,Times,serif';
+    $init['font_formats'] = _theme_get_tinymce_font_formats();
     $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
     $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
     $init['plugins'] = trim(($init['plugins'] ?? '') . ' textcolor lineheight');
@@ -67,7 +109,7 @@ add_filter('tiny_mce_before_init', 'my_acf_wysiwyg_custom_settings', 1);
 // 3️⃣ Apply to ACF WYSIWYG - Only fonts and sizes
 function my_acf_tinymce_settings($init, $id)
 {
-    $init['font_formats'] = 'Open Sans=Open Sans,sans-serif;Fraunces=Fraunces,serif;Arial=Arial,Helvetica,sans-serif;Times New Roman=Times New Roman,Times,serif';
+    $init['font_formats'] = _theme_get_tinymce_font_formats();
     $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
     $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
     $init['plugins'] = trim(($init['plugins'] ?? '') . ' textcolor lineheight');
@@ -205,7 +247,7 @@ add_action('after_setup_theme', 'my_wp_editor_formats');
 function my_wp_editor_default_settings($init)
 {
     // Font formats (same as ACF)
-    $init['font_formats'] = 'Open Sans=Open Sans,sans-serif;Fraunces=Fraunces,serif;Arial=Arial,Helvetica,sans-serif;Times New Roman=Times New Roman,Times,serif';
+    $init['font_formats'] = _theme_get_tinymce_font_formats();
 
     // Font sizes (same as ACF)
     $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
