@@ -149,7 +149,7 @@ if (!defined('ABSPATH')) {
         if (is_home()) {
             $hero_title = get_the_title(get_option('page_for_posts'));
         } elseif (is_page() || is_single()) {
-            $hero_title = get_the_title($id);
+            $hero_title = get_the_title($post_id);
         } elseif (is_post_type_archive()) {
             $hero_title = post_type_archive_title('', false);
         } elseif (is_tax()) {
