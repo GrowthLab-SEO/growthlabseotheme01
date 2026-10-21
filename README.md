@@ -288,7 +288,7 @@ Other files:
 
 | Function | File | Description |
 | --- | --- | --- |
-| `img_print_picture_tag(...)` / `img_generate_picture_tag(...)` | `picture-optimization.php` | Echo / return a responsive `<picture>`. Named args: `img`, `mobile_img`, `tablet_img`, `max_size`, `min_size`, `classes`, `id`, `alt_text`, `is_cover`, `img_attr`, `is_priority`. |
+| `img_print_picture_tag(...)` / `img_generate_picture_tag(...)` | `picture-optimization.php` | Echo / return a responsive `<picture>`. Named args: `img`, `mobile_img`, `tablet_img`, `max_size`, `min_size`, `classes`, `id`, `alt_text`, `is_cover`, `img_attr` (preferably an array, its values are escaped), `is_priority`, `fetch_priority` (`false` for priority images that aren't the LCP element, e.g. the logo). |
 | `image_to_svg(array\|string $image, string $classes = '')` | `svg-support.php` | Inlines a local SVG (wrapped in a `<div>`), or prints an `<img>` for other formats. Accepts an ACF image array or a URL; the inlined SVG keeps the image's alt text (`role="img"` + `aria-label`, or `aria-hidden` when decorative). |
 | `theme_get_customizer_css()` | `color-scheme.php` | `:root` color variables. |
 | `hex_to_rgb($hex, $fallback = '#000000')` | `color-scheme.php` | `#15253f` to `21, 37, 63`. 3-digit colors are expanded; empty or invalid values use `$fallback` (the theme default for the Customizer colors). |
@@ -353,10 +353,14 @@ Translations: `load_theme_textdomain('growthlabseotheme01', get_template_directo
 
 ### Pictures
 
-`img_print_picture_tag()` builds a `<picture>` with `<source>` elements per breakpoint (`$GLOBALS['breakpoints']` in `functions.php`: tablet 768px, ldpi 1024px, mdpi 1280px, hdpi 1920px), picking registered sizes between `min_size` and `max_size`. `is_cover` uses the cover sizes and optional tablet/mobile images.
-
-- WebP `<source>` elements are added when a `.webp` copy exists (`image.jpg.webp`).
-- Non-priority images use `data-src` / `data-srcset` and the `lazy-image` class; `js/picture-optimization.js` swaps them in with an IntersectionObserver (100px margin) only when they approach the viewport, and picks up images added later (e.g. Splide clones); browsers without IntersectionObserver load every image at once. Priority images (`is_priority: true`) load eagerly with `fetchpriority="high"`; the header logo is one.
+- `img_print_picture_tag()` builds a `<picture>` with one `<source>` per breakpoint (`$GLOBALS['breakpoints']` in `functions.php`: tablet 768px, ldpi 1024px, mdpi 1280px, hdpi 1920px). Each breakpoint gets the widest generated size that fits it, never smaller than `min_size` (what phones get) nor larger than `max_size`; phones never get a larger file than desktops. Breakpoints that would repeat the file of the next smaller one are dropped.
+- Image sizes are read from the attachment metadata, which has the real width of each file (sizes without hard crop keep each image's proportions, so they can be narrower than the registered width).
+- `is_cover: true` (hero backgrounds) uses `full`, `cover-desktop`, `cover-tablet` (1024-1279px screens), `cover-tablet-portrait` and `cover-mobile-portrait`. A `tablet_img` is only used for 768-1023px screens; larger screens always get the main image. Phones get the `mobile_img`, else the `tablet_img`, else the main image, in a portrait crop; without one, the smallest file at least 1000px tall (or the tallest file), so a very large original isn't sent to phones when a generated size would do.
+- A URL of a generated size (`photo-800x533.jpg`) is resolved to its attachment; URLs outside the media library are printed as a plain lazy image.
+- WebP `<source>` elements are added when the image is WebP or a `.webp` copy exists (`image.jpg.webp`).
+- Non-priority images use `data-src` / `data-srcset` and the `lazy-image` class; `js/picture-optimization.js` swaps them in with an IntersectionObserver (100px margin) only when they approach the viewport, and picks up images added later (e.g. Splide clones); browsers without IntersectionObserver load every image at once. A `<noscript>` copy is printed for browsers without JavaScript.
+- Lazy images get `--ar-{breakpoint}-w/h` custom properties with the real size of the file each breakpoint serves; `styles/globals/_picture-optimization.scss` turns them into an `aspect-ratio`, so their space is reserved before they load. Its breakpoint list must match `$GLOBALS['breakpoints']`.
+- `is_priority: true` loads the image eagerly with `fetchpriority="high"` (the hero background); the header logo and the hero side portraits pass `fetch_priority: false`, so they load eagerly without competing with the hero image.
 
 ### CSS and JavaScript
 
