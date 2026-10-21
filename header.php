@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
                     if (function_exists('the_custom_logo') && has_custom_logo()) {
                         $custom_logo_id = get_theme_mod('custom_logo');
                         $image = wp_get_attachment_image_url($custom_logo_id, 'full');
-                        img_print_picture_tag(img: $image, max_size: "medium", min_size: "thumbnail", alt_text: get_bloginfo('name'), is_priority: true, classes: "site-logo__pic");
+                        img_print_picture_tag(img: $image, max_size: "medium", min_size: "thumbnail", alt_text: get_bloginfo('name'), is_priority: true, fetch_priority: false, classes: "site-logo__pic");
                     }
                     ?>
                     <span><?= esc_html(get_bilingual_text(__('Site Logo', 'growthlabseotheme01'), 'Logotipo del sitio')) ?></span>
