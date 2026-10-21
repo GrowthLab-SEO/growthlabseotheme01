@@ -64,6 +64,6 @@ if (!$bg_mobile) $bg_mobile = [];
                 </div>
             <?php endif ?>
         </div>
-        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true, fetch_priority: false); ?>
+        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true); ?>
     </div>
 </section>
