@@ -444,6 +444,8 @@ if (! function_exists('theme_get_above_fold_font_variants')) {
      * Each variant: role, weight, style and optionally
      * - 'hero_styles': hero styles that render it (omitted: every page)
      * - 'media':       media query for the preload (variants used only on some viewports)
+     * - 'when':        content condition (theme_font_variant_condition()), e.g. 'hero_title_bold' for the weight of
+     *                  <strong>/<b> in the hero title, which only exists when the editor used bold text
      */
     function theme_get_above_fold_font_variants(string $hero_style, string $first_block = ''): array
     {
@@ -456,7 +458,8 @@ if (! function_exists('theme_get_above_fold_font_variants')) {
         ];
 
         $variants = array_values(array_filter($variants, fn($variant) =>
-            empty($variant['hero_styles']) || in_array($hero_style, $variant['hero_styles'], true)
+            (empty($variant['hero_styles']) || in_array($hero_style, $variant['hero_styles'], true))
+            && (empty($variant['when']) || theme_font_variant_condition($variant['when']))
         ));
 
         // Then the first block after the hero (lower priority than the header and hero)
@@ -643,6 +646,22 @@ if (! function_exists('theme_match_font_face')) {
         }
 
         return null;
+    }
+}
+
+if (! function_exists('theme_font_variant_condition')) {
+    /**
+     * Content conditions of theme_get_above_fold_font_variants() variants.
+     * - hero_title_bold: the custom hero title has bold text (<strong> or <b>).
+     */
+    function theme_font_variant_condition(string $condition): bool
+    {
+        if ($condition === 'hero_title_bold') {
+            $title = function_exists('get_page_field') ? (get_page_field('hero_properties')['hero_title'] ?? '') : '';
+            return (bool) preg_match('/<(strong|b)[\s>]/i', (string) $title);
+        }
+
+        return (bool) apply_filters('theme_font_variant_condition', false, $condition);
     }
 }
 
