@@ -35,9 +35,12 @@
                 <?php echo wp_kses_post(wpautop($form_section['contact_form_description'] ?? '')); ?>
               </div>
 
-              <div class="contact-form__form">
-                <?php render_gravity_form($form_section['contact_form'] ?? null, display_title: false, display_description: false); ?>
-              </div>
+              <?php $form_html = get_selected_form_html($form_section); ?>
+              <?php if ($form_html !== ''): ?>
+                <div class="contact-form__form">
+                  <?= $form_html ?>
+                </div>
+              <?php endif; ?>
 
               <?php if (!empty($form_section['message_before_submit'])): ?>
                 <div class="contact-form__message formatted-text tx-center flex-center">
