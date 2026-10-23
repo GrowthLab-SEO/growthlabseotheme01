@@ -107,7 +107,7 @@
                 },
                 {
                     "key": "field_69a6306d4fea5",
-                    "label": "Posts Default Title Tag",
+                    "label": "Posts Cards Default Title Tag",
                     "name": "posts_default_title_tag",
                     "aria-label": "",
                     "type": "select",
@@ -141,7 +141,7 @@
                 },
                 {
                     "key": "field_69a6306d53ada",
-                    "label": "Posts Default Image",
+                    "label": "Posts Cards Default Image",
                     "name": "posts_default_image",
                     "aria-label": "",
                     "type": "image",
@@ -1623,5 +1623,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1786134206
+    "modified": 1792796191
 }
