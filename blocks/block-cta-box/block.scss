@@ -183,7 +183,7 @@
       }
 
       #{$parent}__content p {
-        color: rgb(var(--text-color)); // ✅ FIXED: removed the "x"
+        color: rgb(var(--text));
       }
 
       #{$parent}__separator {
