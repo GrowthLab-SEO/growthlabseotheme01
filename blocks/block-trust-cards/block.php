@@ -47,7 +47,7 @@ if (get_field('toggle_block')):
                             <div class="trust-card__wrapper">
                                 <div class="trust-card__inner border-box">
                                     <div class="formatted-text">
-                                        <?= wp_kses_post($intro_card_content ?? '') ?>
+                                        <?= $intro_card_content ?? '' ?>
                                     </div>
                                 </div>
                             </div>

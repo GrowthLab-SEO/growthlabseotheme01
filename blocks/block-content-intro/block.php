@@ -32,7 +32,7 @@ if (get_field('toggle_block')):
                         if (isset($first_paragraph) && $first_paragraph):
                         ?>
                             <div class="content-intro__heading-text formatted-text tx-center">
-                                <?= wp_kses_post($first_paragraph ?? '') ?>
+                                <?= $first_paragraph ?? '' ?>
                             </div>
                         <?php endif ?>
                     </div>
@@ -63,7 +63,7 @@ if (get_field('toggle_block')):
                         </div>
                     <?php endif ?>
 
-                    <?= wp_kses_post($text_content ?? '') ?>
+                    <?= $text_content ?? '' ?>
 
                     <?php if (!empty($cta_link['url'])): ?>
                         <div class="content-intro__btn">

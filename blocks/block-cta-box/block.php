@@ -51,7 +51,7 @@ if (get_field('toggle_block')):
 
                     <div class="cta-box__main">
                         <div class="cta-box__content formatted-text">
-                            <?= wp_kses_post($text_content ?? '') ?>
+                            <?= $text_content ?? '' ?>
                         </div>
 
                         <?php if (!empty($cta_link['url'])): ?>

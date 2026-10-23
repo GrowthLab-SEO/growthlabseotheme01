@@ -42,7 +42,7 @@ if (get_field('toggle_block')):
                         if (isset($main_content) && !empty($main_content)):
                     ?>
                             <div class="contact-form__content formatted-text tx-center">
-                                <?= wp_kses_post($main_content ?? '') ?>
+                                <?= $main_content ?? '' ?>
                             </div>
                     <?php
                         endif;
@@ -69,7 +69,7 @@ if (get_field('toggle_block')):
 
                             <?php if (isset($contact_form_description) && $contact_form_description): ?>
                                 <div class="form-box__description formatted-text tx-center">
-                                    <?php echo wp_kses_post(wpautop($contact_form_description)); ?>
+                                    <?php echo wpautop($contact_form_description); ?>
                                 </div>
                             <?php endif ?>
 
@@ -79,7 +79,7 @@ if (get_field('toggle_block')):
 
                             <?php if (isset($message_before_submit) && $message_before_submit): ?>
                                 <div class="form-box__message formatted-text tx-center flex-center">
-                                    <?= wp_kses_post($message_before_submit ?? '') ?>
+                                    <?= $message_before_submit ?? '' ?>
                                 </div>
                             <?php endif; ?>
 

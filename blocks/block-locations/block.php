@@ -20,7 +20,7 @@ if (get_field('toggle_block')):
                     get_template_part('template-parts/ampersand', 'separator', array('classes' => 'locations__separator'));
                 }
                 if (isset($main_content) && $main_content) {
-                    echo wp_kses_post($main_content);
+                    echo $main_content;
                 }
                 ?>
             </div>
@@ -33,7 +33,7 @@ if (get_field('toggle_block')):
                             <div class="location-card__inner flex-center">
                                 <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                                 <div class="location-card__content tx-center">
-                                    <?= wp_kses_post($first_card['content'] ?? '') ?>
+                                    <?= $first_card['content'] ?? '' ?>
                                 </div>
                             </div>
                         </div>
@@ -64,7 +64,7 @@ if (get_field('toggle_block')):
                                                 <div class="location-card__inner flex-center">
                                                     <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                                                     <div class="location-card__content tx-center">
-                                                        <?= wp_kses_post($first_card['content'] ?? '') ?>
+                                                        <?= $first_card['content'] ?? '' ?>
                                                     </div>
                                                 </div>
                                             </div>

@@ -32,7 +32,7 @@
               ?>
 
               <div class="contact-form__description formatted-text tx-center">
-                <?php echo wp_kses_post(wpautop($form_section['contact_form_description'] ?? '')); ?>
+                <?php echo wpautop($form_section['contact_form_description'] ?? ''); ?>
               </div>
 
               <?php $form_html = get_selected_form_html($form_section); ?>
@@ -44,7 +44,7 @@
 
               <?php if (!empty($form_section['message_before_submit'])): ?>
                 <div class="contact-form__message formatted-text tx-center flex-center">
-                  <?= wp_kses_post($form_section['message_before_submit']) ?>
+                  <?= $form_section['message_before_submit'] ?>
                 </div>
               <?php endif; ?>
 
@@ -70,7 +70,7 @@
             <?php
             print_title($locations_section['locations_title'] ?? '', $locations_section['locations_title_tag'] ?? '', "locations-footer__title");
             get_template_part('template-parts/ampersand', 'separator', array('classes' => 'locations-footer__separator'));
-            echo wp_kses_post($locations_section['locations_main_content'] ?? '');
+            echo $locations_section['locations_main_content'] ?? '';
             ?>
           </div>
 
@@ -83,7 +83,7 @@
                   <div class="location-card__inner flex-center">
                     <?php if (!empty($locations_section['first_card']['logo'])) img_print_picture_tag(img: $locations_section['first_card']['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
                     <div class="location-card__content tx-center">
-                      <?= wp_kses_post($locations_section['first_card']['content']) ?>
+                      <?= $locations_section['first_card']['content'] ?>
                     </div>
                   </div>
                 </div>
