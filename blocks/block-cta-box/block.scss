@@ -5,12 +5,9 @@
   position: relative;
   overflow-y: visible;
   @include m.flex-center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 
   &[data-visible="true"] {
     content-visibility: visible;
-    opacity: 1;
   }
 
   $parent: &;
