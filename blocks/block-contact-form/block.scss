@@ -20,9 +20,12 @@ aside {
   }
 }
 
+// The root and title rules are scoped to the block section (.block): the footer form box uses .contact-form too
 .contact-form {
-  position: relative;
-  z-index: 5;
+  &.block {
+    position: relative;
+    z-index: 5;
+  }
 
   $parent: &;
 
@@ -92,7 +95,7 @@ aside {
     }
   }
 
-  &__title {
+  &.block &__title {
     text-align: center;
     @include m.title(null, 4rem, 4.2vw, 4.8rem);
   }
