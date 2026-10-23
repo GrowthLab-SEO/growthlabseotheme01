@@ -44,15 +44,22 @@
     }
   }
 
+  // The class is on the <picture>: it clips the round avatar and the <img> fills it
   &__pic {
     width: 80px;
     height: 80px;
     position: relative;
     z-index: 2;
     display: block;
-    object-fit: contain;
-    object-position: center center;
+    overflow: hidden;
     border-radius: 50%;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
   }
 
   &__src {
