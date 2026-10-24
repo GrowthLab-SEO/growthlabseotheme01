@@ -2,6 +2,7 @@
 @use "../../styles/globals/mixins" as m;
 @use "../template-parts/post-card";
 @use "../template-parts/sidebar";
+@use "../template-parts/posts-filters";
 
 .blog,
 .archive {

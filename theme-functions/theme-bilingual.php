@@ -40,3 +40,42 @@ add_filter('theme_page_hero_title', function ($title) {
     /* translators: %s: search query */
     return sprintf('Resultados de búsqueda para: %s', get_search_query());
 });
+
+// Spanish texts of the shared templates and scripts (e.g. the blog filters) on Spanish pages: they use the theme's
+// translatable strings, which this map replaces under /es/
+add_filter('gettext_growthlabseotheme01', function ($translation, $text) {
+    static $spanish = array(
+        'Search posts'                              => 'Buscar entradas',
+        'Title, keywords, content…'                 => 'Título, palabras clave, contenido…',
+        'Category'                                  => 'Categoría',
+        'All categories'                            => 'Todas las categorías',
+        'Month'                                     => 'Mes',
+        'All months'                                => 'Todos los meses',
+        'Year'                                      => 'Año',
+        'All years'                                 => 'Todos los años',
+        'Apply filters'                             => 'Aplicar filtros',
+        'Clear'                                     => 'Limpiar',
+        'January'                                   => 'Enero',
+        'February'                                  => 'Febrero',
+        'March'                                     => 'Marzo',
+        'April'                                     => 'Abril',
+        'May'                                       => 'Mayo',
+        'June'                                      => 'Junio',
+        'July'                                      => 'Julio',
+        'August'                                    => 'Agosto',
+        'September'                                 => 'Septiembre',
+        'October'                                   => 'Octubre',
+        'November'                                  => 'Noviembre',
+        'December'                                  => 'Diciembre',
+        'No posts found for the selected filters.'  => 'No se encontraron entradas con los filtros seleccionados.',
+        'Could not load posts. Please try again.'   => 'No se pudieron cargar las entradas. Inténtalo de nuevo.',
+        'Read More'                                 => 'Leer más',
+        'Read more about %s'                        => 'Leer más sobre %s',
+        'Remove %s'                                 => 'Quitar %s',
+        'Prev'                                      => 'Anterior',
+        'Next'                                      => 'Siguiente',
+    );
+
+    if (!isset($spanish[$text]) || !filterContentByLanguage()) return $translation;
+    return $spanish[$text];
+}, 10, 2);
