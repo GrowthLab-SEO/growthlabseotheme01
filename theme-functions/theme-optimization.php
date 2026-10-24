@@ -124,9 +124,13 @@ add_filter('the_content', function ($content) {
             $width = $width_match[1] ?? '100%';
             $height = $height_match[1] ?? '450';
 
-            // Append px only to purely numeric values; keep other units (e.g. 100%) as they are
-            $width = is_numeric($width) ? $width . 'px' : $width;
-            $height = is_numeric($height) ? $height . 'px' : $height;
+            // Append "px" only to unitless numbers; keep values like "100%" as they are
+            $css_size = function ($value) {
+                $value = trim($value);
+                return is_numeric($value) ? $value . 'px' : $value;
+            };
+            $width  = $css_size($width);
+            $height = $css_size($height);
 
             return sprintf(
                 '<div id="%s" class="gmap-lazy" data-src="%s" style="width:%s;height:%s;"></div>',

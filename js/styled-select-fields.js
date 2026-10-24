@@ -1,6 +1,6 @@
 const styledSelectSelector =
   "select:not(.posts-filters__select):not([multiple]):not(.styled-select-field)";
-// Fallback label for selects without a label or selected text, in the language of the page (see functions.php)
+// Fallback label for selects without a label or selected text (translatable, see functions.php)
 const styledSelectPlaceholder =
   (window.styledSelectData && window.styledSelectData.placeholder) || "Select an option";
 let openStyledSelect = null;

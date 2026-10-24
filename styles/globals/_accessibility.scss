@@ -9,8 +9,8 @@
 }
 
 // Collapsed accordions keep their content out of the tab order and away from screen readers. The content
-// transition delays the change, so it stays visible until it finishes closing.
-.accordion:not(.open) .accordion__content {
+// transition delays the change, so it stays visible until it finishes closing. Disabled accordions always show it.
+.accordion:not(.open, .disabled) .accordion__content {
   visibility: hidden;
 }
 
