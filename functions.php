@@ -265,13 +265,17 @@ function inline_main_critical_css()
 
     $main_css_file = get_template_directory() . "/styles/main-min.css";
     $style_css = get_stylesheet_directory() . '/style.css';
+    // Compiled styles of the child theme (its styles/main.scss, built with this theme's gulpfile), printed between
+    // the parent styles and the child's style.css
+    $child_css_file = is_child_theme() ? get_stylesheet_directory() . '/styles/main-min.css' : '';
+    if ($child_css_file && !file_exists($child_css_file)) $child_css_file = '';
     $splide_css_file = get_template_directory() . '/styles/vendor/splide/splide-core.min.css';
     // Splide critical CSS is only added when carousels are present
     $include_splide = growthlabseotheme01_request_uses_splide() && file_exists($splide_css_file);
     $theme_uri = get_template_directory_uri();
 
     // The cache key covers everything the output depends on: theme URI, file mtimes, included files and dynamic CSS
-    $files = array($main_css_file, $style_css);
+    $files = array_filter(array($main_css_file, $child_css_file, $style_css));
     if ($include_splide) $files[] = $splide_css_file;
     foreach ($block_files as $type_files) {
         foreach ($type_files as $file) $files[] = $file;
@@ -284,6 +288,7 @@ function inline_main_critical_css()
         // This file builds the CSS, so changing it invalidates the cache too
         @filemtime(__FILE__),
         $theme_uri,
+        get_stylesheet_directory_uri(),
         $mtimes,
         $block_files,
         $include_splide,
@@ -298,6 +303,10 @@ function inline_main_critical_css()
         $critical_css = '';
         if (file_exists($main_css_file)) {
             $critical_css .= file_get_contents($main_css_file);
+        }
+
+        if ($child_css_file) {
+            $critical_css .= file_get_contents($child_css_file);
         }
 
         // Add theme stylesheet
@@ -323,6 +332,8 @@ function inline_main_critical_css()
             $critical_css .= "\n/* Block Critical CSS */\n" . $block_critical_css;
         }
 
+        // The CSS is inline, so relative url()s would resolve against the page: theme assets use these placeholders
+        $critical_css = str_replace('{child-theme-path}', get_stylesheet_directory_uri(), $critical_css);
         $critical_css = preg_replace('/\{theme-path\}/', $theme_uri, $critical_css);
         // Minify CSS: remove comments, extra spaces, and newlines
         $critical_css = preg_replace('/\/\*.*?\*\//s', '', $critical_css); // Remove CSS comments
@@ -398,6 +409,19 @@ function growthlabseotheme01_scripts()
             true
         );
         wp_script_add_data('growthlabseotheme01-picture-optimization', 'strategy', 'defer');
+    }
+
+    // Child theme scripts (its js/main.js, built with this theme's gulpfile)
+    $child_js_file = get_stylesheet_directory() . '/js/main-min.js';
+    if (is_child_theme() && file_exists($child_js_file)) {
+        wp_enqueue_script(
+            'growthlabseotheme01-child-scripts',
+            get_stylesheet_directory_uri() . '/js/main-min.js',
+            array('growthlabseotheme01-main-scripts'),
+            filemtime($child_js_file),
+            true
+        );
+        wp_script_add_data('growthlabseotheme01-child-scripts', 'strategy', 'defer');
     }
 
     // Third party JS scripts.
