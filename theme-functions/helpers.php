@@ -1,4 +1,8 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly.
+}
+
 if (!function_exists('get_text_domain')) {
     function get_text_domain()
     {
@@ -6,8 +10,6 @@ if (!function_exists('get_text_domain')) {
     }
 }
 
-
-// Helper function to get ACF option fields
 if (!function_exists('get_theme_svg')) {
     /**
      * Returns the markup of a static SVG file of the theme (path relative to the theme root, child theme first),
@@ -223,7 +225,6 @@ if (!function_exists('format_spacing_item')) {
     }
 }
 
-// Language Filter
 if (!function_exists('filterContentByLanguage')) {
     function filterContentByLanguage($lang = 'es')
     {
@@ -240,18 +241,96 @@ if (!function_exists('filterContentByLanguage')) {
     }
 }
 
-// The /es/ URL prefix switches content to Spanish without changing the WordPress locale, so language_attributes()
-// would still print the site language there. Use "es" on Spanish pages.
+if (!function_exists('get_languages_map')) {
+    function get_languages_map()
+    {
+        static $map = null;
+        if ($map !== null) return $map;
+
+        $lang_options = get_field_options('options_by_language') ?: [];
+        if (!is_array($lang_options)) {
+            $map = [];
+            return $map;
+        }
+
+        $map = array_column($lang_options, 'language', 'url_language_slug');
+        return $map;
+    }
+}
+
+if (!function_exists('get_current_language')) {
+    function get_current_language()
+    {
+        static $cached = null;
+        if ($cached !== null) return $cached;
+
+        $languages = get_languages_map();
+
+        foreach ($languages as $slug => $language) {
+            if (filterContentByLanguage($slug)) {
+                $cached = [
+                    'slug'     => $slug,
+                    'language' => $language
+                ];
+                return $cached;
+            }
+        }
+
+        $cached = [
+            'slug'     => '',
+            'language' => __('English', 'growthlabseotheme01')
+        ];
+
+        return $cached;
+    }
+}
+
+// Language URL slugs (options_by_language) switch content without changing the WordPress locale, so
+// language_attributes() would still print the site language there. Use the slug as the lang code when it is one.
 add_filter('language_attributes', function ($output) {
-    if (!filterContentByLanguage()) return $output;
-    return preg_replace('/lang="[^"]*"/', 'lang="es"', $output);
+    $slug = get_current_language()['slug'] ?? '';
+    if ($slug === '' || !preg_match('/^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i', $slug)) return $output;
+    return preg_replace('/lang="[^"]*"/', 'lang="' . esc_attr($slug) . '"', $output);
 });
 
-//Phone number format remover
-function get_flat_number($phone)
-{
-    if (! $phone) return;
-    return preg_replace("/[^0-9]/", '', $phone);
+if (!function_exists('get_current_language_suffix')) {
+    function get_current_language_suffix()
+    {
+        if (get_current_language()['slug'] !== '') return '_' . get_current_language()['slug'];
+        return '';
+    }
+}
+
+if (!function_exists('get_current_language_options')) {
+    function get_current_language_options()
+    {
+        $current = get_current_language();
+        $slug    = $current['slug'] ?? '';
+
+        if ($slug === '') {
+            return get_field_options('options');
+        }
+
+        $lang_opts = get_field_options('options_by_language') ?: [];
+        if (!is_array($lang_opts)) return get_field_options('options');
+
+        foreach ($lang_opts as $lang_opt) {
+            if (!isset($lang_opt['url_language_slug'])) continue;
+            if ($lang_opt['url_language_slug'] === $slug && isset($lang_opt['options'])) {
+                return $lang_opt['options'];
+            }
+        }
+
+        return get_field_options('options');
+    }
+}
+
+if (!function_exists('get_flat_number')) {
+    function get_flat_number($phone)
+    {
+        if (!$phone) return;
+        return preg_replace("/[^0-9]/", '', $phone);
+    }
 }
 
 // tel: URL for a phone number. US numbers get the +1 country code once, whether or not the number already includes it;
@@ -353,57 +432,25 @@ if (!function_exists('get_block_extract_attribute')) {
     }
 }
 
-// Blocks of the current singular post, parsed once per post and flattened (inner blocks follow their parent).
-// Synced patterns (core/block) are expanded, so the blocks they contain count as used on the page. Falls back to the
-// queried post when a secondary loop changed the global $post. Returns [] for non-singular requests.
-if (!function_exists('get_current_post_blocks')) {
-    function get_current_post_blocks()
+// Query arg a posts grid paginates with, so several grids on one page paginate independently. The first grid of the
+// request returns '' (it keeps the default paged/page query var, so existing URLs keep working); the next ones return
+// "grid-2-page", "grid-3-page"... Grids are numbered in render order with a static counter per request (ACF block ids
+// can't be used: identical blocks share the same id).
+if (!function_exists('get_posts_grid_page_arg')) {
+    function get_posts_grid_page_arg()
     {
-        static $cache = [];
+        static $index = 0;
+        $index++;
 
-        if (!is_singular()) return [];
-
-        global $post;
-        $current = $post;
-        if (!($current instanceof WP_Post) || strpos((string) $current->post_content, '<!-- wp:') === false) {
-            $queried = get_queried_object();
-            if ($queried instanceof WP_Post) $current = $queried;
-        }
-        if (!($current instanceof WP_Post) || strpos((string) $current->post_content, '<!-- wp:') === false) return [];
-
-        if (isset($cache[$current->ID])) return $cache[$current->ID];
-
-        $blocks = [];
-        $expanded_refs = [];
-        $walk = function ($items) use (&$walk, &$blocks, &$expanded_refs) {
-            foreach ($items as $block) {
-                $blocks[] = $block;
-                if (!empty($block['innerBlocks'])) $walk($block['innerBlocks']);
-
-                // Each synced pattern is expanded once, which also stops patterns that include themselves
-                $ref = ($block['blockName'] ?? '') === 'core/block' ? (int) ($block['attrs']['ref'] ?? 0) : 0;
-                if ($ref && !isset($expanded_refs[$ref])) {
-                    $expanded_refs[$ref] = true;
-                    $walk(parse_blocks((string) get_post_field('post_content', $ref)));
-                }
-            }
-        };
-        $walk(parse_blocks($current->post_content));
-
-        return $cache[$current->ID] = $blocks;
+        return $index === 1 ? '' : 'grid-' . $index . '-page';
     }
 }
 
-// Numbers the posts grids rendered in the current request and returns the query arg each one paginates with.
-// The first grid returns '' and keeps using WordPress' paged/page var, so existing URLs keep working; every
-// additional grid gets its own arg (grid-2-page, grid-3-page...) so paginating one grid doesn't paginate the others.
+// Former name of get_posts_grid_page_arg() in theme-01. It calls the same function, so grids keep one counter.
 if (!function_exists('get_next_posts_grid_page_arg')) {
     function get_next_posts_grid_page_arg()
     {
-        static $grid_count = 0;
-        $grid_count++;
-
-        return $grid_count === 1 ? '' : 'grid-' . $grid_count . '-page';
+        return get_posts_grid_page_arg();
     }
 }
 
@@ -493,12 +540,44 @@ if (!function_exists('get_post_fields_with_defaults')) {
     }
 }
 
-// Theme-01 is bilingual through the /es/ URL prefix without switching the WordPress locale, so its fixed
-// interface strings pick the Spanish text on Spanish pages and the (translatable) English text elsewhere
-if (!function_exists('get_bilingual_text')) {
-    function get_bilingual_text($english, $spanish)
+// Blocks of the current singular post, parsed once per post and flattened (inner blocks follow their parent).
+// Synced patterns (core/block) are expanded, so the blocks they contain count as used on the page. Falls back to the
+// queried post when a secondary loop changed the global $post. Returns [] for non-singular requests.
+if (!function_exists('get_current_post_blocks')) {
+    function get_current_post_blocks()
     {
-        return filterContentByLanguage() ? $spanish : $english;
+        static $cache = [];
+
+        if (!is_singular()) return [];
+
+        global $post;
+        $current = $post;
+        if (!($current instanceof WP_Post) || strpos((string) $current->post_content, '<!-- wp:') === false) {
+            $queried = get_queried_object();
+            if ($queried instanceof WP_Post) $current = $queried;
+        }
+        if (!($current instanceof WP_Post) || strpos((string) $current->post_content, '<!-- wp:') === false) return [];
+
+        if (isset($cache[$current->ID])) return $cache[$current->ID];
+
+        $blocks = [];
+        $expanded_refs = [];
+        $walk = function ($items) use (&$walk, &$blocks, &$expanded_refs) {
+            foreach ($items as $block) {
+                $blocks[] = $block;
+                if (!empty($block['innerBlocks'])) $walk($block['innerBlocks']);
+
+                // Each synced pattern is expanded once, which also stops patterns that include themselves
+                $ref = ($block['blockName'] ?? '') === 'core/block' ? (int) ($block['attrs']['ref'] ?? 0) : 0;
+                if ($ref && !isset($expanded_refs[$ref])) {
+                    $expanded_refs[$ref] = true;
+                    $walk(parse_blocks((string) get_post_field('post_content', $ref)));
+                }
+            }
+        };
+        $walk(parse_blocks($current->post_content));
+
+        return $cache[$current->ID] = $blocks;
     }
 }
 
@@ -562,21 +641,28 @@ if (!function_exists('get_page_hero_title')) {
     {
         if (is_home()) {
             $page_id = (int) get_option('page_for_posts');
-            return $page_id ? get_the_title($page_id) : __('Blog', 'growthlabseotheme01');
-        }
-        if (is_search()) {
+            $title = $page_id ? get_the_title($page_id) : __('Blog', 'growthlabseotheme01');
+        } elseif (is_search()) {
             /* translators: %s: search query */
-            return sprintf(get_bilingual_text(__('Search results for: %s', 'growthlabseotheme01'), 'Resultados de búsqueda para: %s'), get_search_query());
+            $title = sprintf(__('Search results for: %s', 'growthlabseotheme01'), get_search_query());
+        } elseif (is_singular()) {
+            $title = get_the_title(get_queried_object_id());
+        } elseif (is_category() || is_tag() || is_tax()) {
+            $title = single_term_title('', false);
+        } elseif (is_post_type_archive()) {
+            $title = post_type_archive_title('', false);
+        } elseif (is_archive()) {
+            $title = get_the_archive_title();
+        } else {
+            $title = '';
         }
-        if (is_singular()) return get_the_title(get_queried_object_id());
-        if (is_category() || is_tag() || is_tax()) return single_term_title('', false);
-        if (is_post_type_archive()) return post_type_archive_title('', false);
-        if (is_archive()) return get_the_archive_title();
-        return '';
+
+        // Lets a theme or a child theme change the fallback title, e.g. to translate the search title
+        return apply_filters('theme_page_hero_title', $title);
     }
 }
 
-//Render a Gravity Forms form only if the plugin is active
+// Render a Gravity Forms form only if the plugin is active
 if (!function_exists('render_gravity_form')) {
     function render_gravity_form(...$args)
     {
@@ -605,17 +691,18 @@ if (!function_exists('get_selected_form_html')) {
     }
 }
 
-//Format Numerical Amount
-function format_number_abbreviated($number)
-{
-    if ($number >= 1000000000) {
-        return round($number / 1000000000, 1) . 'B';
-    } elseif ($number >= 1000000) {
-        return round($number / 1000000, 1) . 'M';
-    } elseif ($number >= 1000) {
-        return round($number / 1000, 1) . 'K';
+if (!function_exists('format_number_abbreviated')) {
+    function format_number_abbreviated($number)
+    {
+        if ($number >= 1000000000) {
+            return round($number / 1000000000, 1) . 'B';
+        } elseif ($number >= 1000000) {
+            return round($number / 1000000, 1) . 'M';
+        } elseif ($number >= 1000) {
+            return round($number / 1000, 1) . 'K';
+        }
+        return $number;
     }
-    return $number;
 }
 
 // Returns the 11-character ID of a single YouTube video, or false for any URL that is not a video
@@ -704,8 +791,7 @@ function phonenumber($atts, $content = null)
         'text' => ''
     ), $atts, 'phonenumber');
 
-    $es = filterContentByLanguage() ? '_es' : '';
-    $options = get_field_options('options' . $es);
+    $options = get_current_language_options();
     $phone = $options['main_phone_number'] ?? '';
 
     // Fall back to the "text" attribute when no phone number is set in the options
@@ -743,3 +829,85 @@ function phonenumber($atts, $content = null)
     return $wrapper ? "<$wrapper$id_class>$link</$wrapper>" : $link;
 }
 add_shortcode('phonenumber', 'phonenumber');
+
+if (!function_exists('transform_inline_font_sizes')) {
+    // Converts inline font-size styles into custom CSS variables
+    function transform_inline_font_sizes(
+        string $html,
+        string $font_size_var = '--fs'
+    ): string {
+
+        if (trim($html) === '') {
+            return $html;
+        }
+
+        $previous_errors = libxml_use_internal_errors(true);
+
+        $dom = new DOMDocument();
+
+        // Wrap the fragment in a container so multi-root WYSIWYG markup isn't nested into its first element, and declare
+        // UTF-8 instead of converting to HTML entities (mb_convert_encoding 'HTML-ENTITIES' is deprecated in PHP 8.2+)
+        $dom->loadHTML(
+            '<?xml encoding="UTF-8"><div id="transform-inline-font-sizes">' . $html . '</div>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous_errors);
+
+        $container = $dom->getElementById('transform-inline-font-sizes');
+        if (!$container) {
+            return $html;
+        }
+
+        foreach ($container->getElementsByTagName('*') as $element) {
+
+            if (!$element->hasAttribute('style')) {
+                continue;
+            }
+
+            $style = $element->getAttribute('style');
+
+            if (
+                !preg_match(
+                    '/font-size\s*:\s*([^;]+)/i',
+                    $style,
+                    $matches
+                )
+            ) {
+                continue;
+            }
+
+            $font_size = trim($matches[1]);
+
+            // Remove the original font-size
+            $style = preg_replace(
+                '/font-size\s*:\s*[^;]+;?/i',
+                '',
+                $style
+            );
+
+            $style = trim($style);
+
+            if ($style !== '' && substr($style, -1) !== ';') {
+                $style .= ';';
+            }
+
+            // Add the variable and the new rule
+            $style .= sprintf(
+                '%s:%s;font-size:calc(var(%s) * var(--font-scale, 1));',
+                $font_size_var,
+                $font_size,
+                $font_size_var
+            );
+
+            $element->setAttribute('style', $style);
+        }
+
+        $output = '';
+        foreach ($container->childNodes as $child) {
+            $output .= $dom->saveHTML($child);
+        }
+
+        return $output;
+    }
+}
