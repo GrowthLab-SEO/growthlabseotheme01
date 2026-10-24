@@ -1,14 +1,10 @@
 <?php
-// Define default fonts
-$default_fonts = [
-    'primary' => 'Open Sans',
-    'secondary' => 'Fraunces'
-];
+// The default fonts ($default_fonts) are defined in theme-functions/theme-config.php, which loads first
 
 // ─── CORE FUNCTION: reads the Font Library + theme fonts ─────────────────────
 if (! function_exists('theme_get_all_fonts')) {
     /**
-     * Returns all available fonts, combining:
+     * Returns all available fonts by combining:
      *   1. The theme's base fonts (hardcoded — always present).
      *   2. Fonts installed through the WP 7+ Font Library ('custom' sub-key
      *      in WP_Theme_JSON_Resolver).
@@ -23,16 +19,17 @@ if (! function_exists('theme_get_all_fonts')) {
      */
     function theme_get_all_fonts(): array
     {
-        // 1. The theme's base fonts — always available, keyed by slug
+        // 1. Theme base fonts (the defaults of theme-config.php) — always available, keyed by slug
+        global $default_fonts;
         $fonts = [
             'primary' => [
-                'name'        => 'Open Sans',
-                'font_family' => '"Open Sans", sans-serif',
+                'name'        => $default_fonts['primary'],
+                'font_family' => '"' . $default_fonts['primary'] . '", sans-serif',
                 'slug'        => 'primary',
             ],
             'secondary' => [
-                'name'        => 'Fraunces',
-                'font_family' => '"Fraunces", serif',
+                'name'        => $default_fonts['secondary'],
+                'font_family' => '"' . $default_fonts['secondary'] . '", serif',
                 'slug'        => 'secondary',
             ],
         ];
@@ -58,7 +55,7 @@ if (! function_exists('theme_get_all_fonts')) {
             ];
         }
 
-        // custom first, then the theme's
+        // custom first, then the theme fonts
         return array_merge($custom_fonts, $fonts);
     }
 }
@@ -188,8 +185,8 @@ if (! function_exists('register_font_setting')) {
         } else {
             $choices = [];
             foreach ($all_fonts as $slug => $data) {
-                // Use the font name as the saved value (same as before)
-                // to stay compatible with existing get_theme_mod values.
+                // Use the font name as the stored value (same as before)
+                // to stay compatible with the existing get_theme_mod values.
                 $choices[$data['name']] = $data['name'];
             }
         }
@@ -221,21 +218,8 @@ if (! function_exists('theme_get_default_font_faces')) {
      */
     function theme_get_default_font_faces(): array
     {
-        return [
-            'Fraunces' => [
-                ['weight' => '400', 'style' => 'normal', 'file' => 'fraunces-v38-latin/fraunces-v38-latin-regular.woff2', 'display' => 'swap'],
-                ['weight' => '300', 'style' => 'normal', 'file' => 'fraunces-v38-latin/fraunces-v38-latin-300.woff2', 'display' => 'optional'],
-                ['weight' => '500', 'style' => 'normal', 'file' => 'fraunces-v38-latin/fraunces-v38-latin-500.woff2', 'display' => 'optional'],
-                ['weight' => '600', 'style' => 'normal', 'file' => 'fraunces-v38-latin/fraunces-v38-latin-600.woff2', 'display' => 'swap'],
-                ['weight' => '700', 'style' => 'normal', 'file' => 'fraunces-v38-latin/fraunces-v38-latin-700.woff2', 'display' => 'swap'],
-            ],
-            'Open Sans' => [
-                ['weight' => '400', 'style' => 'normal', 'file' => 'open-sans-v44-latin/open-sans-v44-latin-regular.woff2', 'display' => 'swap'],
-                ['weight' => '500', 'style' => 'normal', 'file' => 'open-sans-v44-latin/open-sans-v44-latin-500.woff2', 'display' => 'optional'],
-                ['weight' => '600', 'style' => 'normal', 'file' => 'open-sans-v44-latin/open-sans-v44-latin-600.woff2', 'display' => 'swap'],
-                ['weight' => '700', 'style' => 'normal', 'file' => 'open-sans-v44-latin/open-sans-v44-latin-700.woff2', 'display' => 'swap'],
-            ],
-        ];
+        // This theme's files (theme-config.php)
+        return (array) theme_get_config('font_faces');
     }
 }
 
@@ -320,9 +304,9 @@ if (! function_exists('theme_get_fonts_css')) {
 
 if (! function_exists('_theme_resolve_font_family')) {
     /**
-     * Given a font name (saved in theme_mod), returns the full CSS value
-     * (with fallback) if it is in the library, or builds a simple one with
-     * the given generic fallback.
+     * Given a font name (stored in theme_mod), returns the full CSS value
+     * (with fallback) if it is in the library, or builds a simple one
+     * with the generic fallback passed in.
      *
      * @internal
      */
@@ -449,13 +433,8 @@ if (! function_exists('theme_get_above_fold_font_variants')) {
      */
     function theme_get_above_fold_font_variants(string $hero_style, string $first_block = ''): array
     {
-        $variants = [
-            // Hero title
-            ['role' => 'secondary', 'weight' => '600', 'style' => 'normal'],
-            // Header menu, callout and hero text
-            ['role' => 'primary', 'weight' => '400', 'style' => 'normal'],
-            ['role' => 'primary', 'weight' => '700', 'style' => 'normal'],
-        ];
+        // Measured on this theme's templates (theme-config.php)
+        $variants = (array) theme_get_config('above_fold_font_variants');
 
         $variants = array_values(array_filter($variants, fn($variant) =>
             (empty($variant['hero_styles']) || in_array($hero_style, $variant['hero_styles'], true))
@@ -483,23 +462,8 @@ if (! function_exists('theme_get_first_block_font_variants')) {
     {
         if ($block_name === '') return [];
 
-        $map = [
-            'acf/contact-form'      => ['s600', 'p400', 'p700'],
-            'acf/content-box'       => ['s600', 'p400'],
-            'acf/content-intro'     => ['s600', 'p400', 'p700'],
-            'acf/cta-box'           => ['s600', 'p400', 'p700'],
-            'acf/faq'               => ['s600', 'p400', 'p700'],
-            'acf/featured-video'    => ['s600', 'p400'],
-            'acf/logos-carousel'    => ['s600'],
-            'acf/office-locations'  => ['s600', 'p400', 'p700', 'p600'],
-            'acf/posts-carousel'    => ['s600', 'p400', 'p700'],
-            'acf/posts-grid'        => ['s600', 'p400', 'p700'],
-            'acf/selling-points'    => ['s600', 'p700'],
-            'acf/trust-cards'       => ['s600', 's400', 'p400', 'p700'],
-            'acf/two-columns'       => ['s600', 'p400', 'p700'],
-            'core'                  => ['p400', 'p700'],
-            'default'               => ['s600', 'p400', 'p700'],
-        ];
+        // Measured on this theme's blocks (theme-config.php)
+        $map = (array) theme_get_config('first_block_font_variants');
 
         $key   = str_starts_with($block_name, 'core/') ? 'core' : (isset($map[$block_name]) ? $block_name : 'default');
         $roles = ['p' => 'primary', 's' => 'secondary'];

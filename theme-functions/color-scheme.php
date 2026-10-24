@@ -1,23 +1,5 @@
 <?php
-// Define default colors
-$default_colors = [
-    'primary' => [
-        'default' => '#15253f',
-        'dark'    => '#08182f',
-        'light'   => '#2C3D5B'
-    ],
-    'secondary' => [
-        'default' => '#F4F3EE',
-        'dark'    => '#E7E5DF',
-        'light'   => '#FFFFFF'
-    ],
-    'tertiary' => [
-        'default' => '#BC9061',
-        'dark'    => '#9D7A55',
-        'light'   => '#DCAB77'
-    ],
-    'text' => '#15253f'
-];
+// The default colors ($default_colors) are defined in theme-functions/theme-config.php, which loads first
 
 if (!function_exists('theme_customize_register')) {
     function theme_customize_register($wp_customize)
@@ -65,14 +47,14 @@ if (!function_exists('theme_get_customizer_css')) {
         $css_vars = [];
         foreach ($default_colors as $color_name => $variants) {
             if ($color_name === 'text') {
-                $hex = get_theme_mod('text_color', $variants);
-                $css_vars['--text'] = hex_to_rgb($hex, $variants);
+                $hex              = get_theme_mod('text_color', $variants);
+                $css_vars["--text"] = hex_to_rgb($hex, $variants);
                 continue;
             }
 
             foreach (['default' => '', 'dark' => '-dark', 'light' => '-light'] as $variant => $suffix) {
-                $setting_name = "{$color_name}_color" . ($variant === 'default' ? '' : '_' . $variant);
-                $hex = get_theme_mod($setting_name, $variants[$variant]);
+                $setting_name       = "{$color_name}_color" . ($variant === 'default' ? '' : '_' . $variant);
+                $hex                = get_theme_mod($setting_name, $variants[$variant]);
                 $css_vars["--{$color_name}{$suffix}"] = hex_to_rgb($hex, $variants[$variant]);
             }
         }
