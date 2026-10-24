@@ -35,3 +35,28 @@ add_action('init', function () {
 
     update_option($option, gmdate('c'), true);
 });
+
+// The footer offices are a carousel when there is more than one office
+add_filter('growthlabseotheme01_request_uses_splide', function ($uses_splide) {
+    if ($uses_splide) return true;
+
+    $options = fill_acf_group_defaults(get_current_language_options(), 'options', 'option');
+    $locations_section = $options['locations_section'] ?? array();
+
+    return empty($locations_section['hide_section'])
+        && !get_page_field('hide_locations_section')
+        && !empty($options['offices'])
+        && count($options['offices']) > 1;
+});
+
+// Spanish texts of the theme scripts on Spanish pages
+add_filter('theme_main_script_data', function ($data) {
+    $data['i18n']['closeVideo']  = esc_attr(get_bilingual_text(__('Close video', 'growthlabseotheme01'), 'Cerrar video'));
+    $data['i18n']['videoDialog'] = esc_attr(get_bilingual_text(__('Video player', 'growthlabseotheme01'), 'Reproductor de video'));
+    return $data;
+});
+
+add_filter('theme_styled_select_data', function ($data) {
+    $data['placeholder'] = get_bilingual_text(__('Select an option', 'growthlabseotheme01'), 'Selecciona una opción');
+    return $data;
+});

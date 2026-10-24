@@ -13,6 +13,7 @@
 // Theme text domain global
 $GLOBALS['theme_text_domain'] = 'growthlabseotheme01';
 
+// Custom breakpoints for this theme
 $GLOBALS['breakpoints'] = [
     'mobile' => '0px',
     'tablet' => '768px',   // differs from the default
@@ -24,8 +25,10 @@ $GLOBALS['breakpoints'] = [
 
 // Include Theme Functions
 $includes = [
-    'theme-functions/theme-config.php', // this theme's design data, read by the files below
-    'theme-functions/theme-bilingual.php', // English and Spanish (/es/): language helpers read by helpers.php
+    // Not shared between the GrowthLab themes: this theme's design data (read by the files below) and, when the
+    // theme has them, its language helpers (loaded before helpers.php)
+    'theme-functions/theme-config.php',
+    'theme-functions/theme-bilingual.php',
     'theme-functions/theme-optimization.php',
     'theme-functions/color-scheme.php',
     'theme-functions/fonts-selector.php',
@@ -35,7 +38,8 @@ $includes = [
     'theme-functions/picture-optimization.php',
     'theme-functions/tiny-mce.php',
     'theme-functions/security-functions.php',
-    'theme-functions/theme-hooks.php', // behavior only this theme has
+    // Not shared: behavior only this theme has, when it has any
+    'theme-functions/theme-hooks.php',
 ];
 
 foreach ($includes as $file) {
@@ -49,13 +53,17 @@ if (!function_exists('growthlabseotheme01_setup')) {
     /**
      * Sets up theme defaults and registers support for various WordPress features.
      *
+     * Note that this function is hooked into the after_setup_theme hook, which
+     * runs before the init hook. The init hook is too late for some features, such
+     * as indicating support for post thumbnails.
+     *
      *
      * @return void
      */
 
     function growthlabseotheme01_setup()
     {
-        // Load the theme translations from the languages folder
+        // Load the theme translations
         load_theme_textdomain('growthlabseotheme01', get_template_directory() . '/languages');
 
         /*
@@ -83,7 +91,7 @@ if (!function_exists('growthlabseotheme01_setup')) {
 
         add_theme_support('custom-logo', $defaults);
 
-        // Disable hard cropping for all image sizes (only write when the stored value differs)
+        // Disable hard cropping for all image sizes (write only when the stored value differs)
         if ((int) get_option('thumbnail_crop') !== 0) {
             update_option('thumbnail_crop', 0);
         }
@@ -98,7 +106,7 @@ if (!function_exists('growthlabseotheme01_setup')) {
             ]);
         });
 
-        //Add custom sized images (match theme-03)
+        //Add custom sized images
         // Covers
         add_image_size('cover-desktop', 1920, 1080, false);
         add_image_size('cover-tablet', 1280, 960, false);
@@ -122,10 +130,10 @@ if (!function_exists('growthlabseotheme01_setup')) {
                 'large'        => __('Large'),
                 'full'         => __('Full Size'),
                 'cover-desktop'  => __('Cover Desktop (1920×1080)', 'growthlabseotheme01'),
-                'cover-tablet'   => __('Cover Tablet (1280x960)', 'growthlabseotheme01'),
+                'cover-tablet'   => __('Cover Tablet (1280×960)', 'growthlabseotheme01'),
                 'cover-mobile'   => __('Cover Mobile (768×432)', 'growthlabseotheme01'),
-                'cover-tablet-portrait'   => __('Cover Tablet (960x1280)', 'growthlabseotheme01'),
-                'cover-mobile-portrait'   => __('Cover Mobile (768×1100)', 'growthlabseotheme01'),
+                'cover-tablet-portrait'   => __('Cover Tablet Portrait (960×1280)', 'growthlabseotheme01'),
+                'cover-mobile-portrait'   => __('Cover Mobile Portrait (768×1100)', 'growthlabseotheme01'),
                 'content'   => __('Content (800×600)', 'growthlabseotheme01'),
                 'featured-small' => __('Featured Small (480×360)', 'growthlabseotheme01'),
             ], $sizes);
@@ -140,11 +148,16 @@ if (!function_exists('growthlabseotheme01_setup')) {
                 'main' => esc_html__('Main Menu', 'growthlabseotheme01')
             )
         );
-        register_nav_menus(
-            array(
-                'main_es' => esc_html__('Main Menu Spanish', 'growthlabseotheme01')
-            )
-        );
+
+        if (function_exists('get_languages_map')) {
+            foreach (get_languages_map() as $slug => $language) {
+                register_nav_menus(
+                    array(
+                        'main_' . $slug => sprintf(esc_html__('Main Menu %s', 'growthlabseotheme01'), $language)
+                    )
+                );
+            }
+        }
     }
 }
 add_action('after_setup_theme', 'growthlabseotheme01_setup');
@@ -154,30 +167,33 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
 
     $data = $theme_json->get_data();
 
-    $data['settings']['color']['defaultPalette'] = false;
-    $data['settings']['color']['defaultGradients'] = false;
-    $data['settings']['typography']['defaultFontSizes'] = false;
-    $data['settings']['spacing']['defaultSpacingSizes'] = false;
+    // ─── DISABLE UNWANTED GLOBAL CSS ────────────────────────────────────────
+    $data['settings']['color']['defaultPalette']            = false;
+    $data['settings']['color']['defaultGradients']          = false;
+    $data['settings']['typography']['defaultFontSizes']     = false;
+    $data['settings']['spacing']['defaultSpacingSizes']     = false;
 
+    // ─── COLOR PALETTE ───────────────────────────────────────────────────────
     $data['settings']['color']['palette'] = [
-        ['name' => __('Primary Color', 'growthlabseotheme01'), 'slug' => 'primary-color', 'color' => get_theme_mod('primary_color', $default_colors['primary']['default'])],
-        ['name' => __('Primary Color Dark', 'growthlabseotheme01'), 'slug' => 'primary-color-dark', 'color' => get_theme_mod('primary_color_dark', $default_colors['primary']['dark'])],
-        ['name' => __('Primary Color Light', 'growthlabseotheme01'), 'slug' => 'primary-color-light', 'color' => get_theme_mod('primary_color_light', $default_colors['primary']['light'])],
-        ['name' => __('Secondary Color', 'growthlabseotheme01'), 'slug' => 'secondary-color', 'color' => get_theme_mod('secondary_color', $default_colors['secondary']['default'])],
+        ['name' => __('Primary Color',        'growthlabseotheme01'), 'slug' => 'primary-color',        'color' => get_theme_mod('primary_color',        $default_colors['primary']['default'])],
+        ['name' => __('Primary Color Dark',   'growthlabseotheme01'), 'slug' => 'primary-color-dark',   'color' => get_theme_mod('primary_color_dark',   $default_colors['primary']['dark'])],
+        ['name' => __('Primary Color Light',  'growthlabseotheme01'), 'slug' => 'primary-color-light',  'color' => get_theme_mod('primary_color_light',  $default_colors['primary']['light'])],
+        ['name' => __('Secondary Color',      'growthlabseotheme01'), 'slug' => 'secondary-color',      'color' => get_theme_mod('secondary_color',      $default_colors['secondary']['default'])],
         ['name' => __('Secondary Color Dark', 'growthlabseotheme01'), 'slug' => 'secondary-color-dark', 'color' => get_theme_mod('secondary_color_dark', $default_colors['secondary']['dark'])],
         ['name' => __('Secondary Color Light', 'growthlabseotheme01'), 'slug' => 'secondary-color-light', 'color' => get_theme_mod('secondary_color_light', $default_colors['secondary']['light'])],
-        ['name' => __('Tertiary Color', 'growthlabseotheme01'), 'slug' => 'tertiary-color', 'color' => get_theme_mod('tertiary_color', $default_colors['tertiary']['default'])],
-        ['name' => __('Tertiary Color Dark', 'growthlabseotheme01'), 'slug' => 'tertiary-color-dark', 'color' => get_theme_mod('tertiary_color_dark', $default_colors['tertiary']['dark'])],
+        ['name' => __('Tertiary Color',       'growthlabseotheme01'), 'slug' => 'tertiary-color',       'color' => get_theme_mod('tertiary_color',       $default_colors['tertiary']['default'])],
+        ['name' => __('Tertiary Color Dark',  'growthlabseotheme01'), 'slug' => 'tertiary-color-dark',  'color' => get_theme_mod('tertiary_color_dark',  $default_colors['tertiary']['dark'])],
         ['name' => __('Tertiary Color Light', 'growthlabseotheme01'), 'slug' => 'tertiary-color-light', 'color' => get_theme_mod('tertiary_color_light', $default_colors['tertiary']['light'])],
-        ['name' => __('Text Color', 'growthlabseotheme01'), 'slug' => 'text-color', 'color' => get_theme_mod('text_color', $default_colors['text'])],
+        ['name' => __('Text Color',           'growthlabseotheme01'), 'slug' => 'text-color',           'color' => get_theme_mod('text_color',           $default_colors['text'])],
     ];
 
-    $font_primary = get_theme_mod('font_primary', $default_fonts['primary']);
+    // ─── FONTS ───────────────────────────────────────────────────────────────
+    $font_primary   = get_theme_mod('font_primary',   $default_fonts['primary']);
     $font_secondary = get_theme_mod('font_secondary', $default_fonts['secondary']);
 
     $data['settings']['typography']['fontFamilies'] = [
-        ['name' => $font_primary, 'slug' => 'primary', 'fontFamily' => '"' . $font_primary . '", sans-serif'],
-        ['name' => $font_secondary, 'slug' => 'secondary', 'fontFamily' => '"' . $font_secondary . '", serif'],
+        ['name' => $font_primary,   'slug' => 'primary',   'fontFamily' => "\"{$font_primary}\", sans-serif"],
+        ['name' => $font_secondary, 'slug' => 'secondary', 'fontFamily' => "\"{$font_secondary}\", serif"],
     ];
 
     $theme_json->update_with($data);
@@ -190,7 +206,7 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
 function growthlabseotheme01_remove_custom_logo_link($html)
 {
     // Extract just the <img> tag from the logo HTML
-    preg_match('/<img[^>]+>/', $html, $matches);
+    preg_match('/<img[^>]*>/', $html, $matches);
 
     if (!empty($matches[0])) {
         return $matches[0];
@@ -200,10 +216,11 @@ function growthlabseotheme01_remove_custom_logo_link($html)
 }
 add_filter('get_custom_logo', 'growthlabseotheme01_remove_custom_logo_link');
 
-/*Custom Excerpt Size*/
+// Excerpt length of this theme's cards (theme-config.php), by post type
 function growthlabseotheme01_custom_excerpt_length($length)
 {
-    return 15;
+    $lengths = (array) theme_get_config('excerpt_length');
+    return (int) ($lengths[get_post_type()] ?? $lengths['default'] ?? $length);
 }
 add_filter('excerpt_length', 'growthlabseotheme01_custom_excerpt_length', 999);
 
@@ -215,43 +232,48 @@ function wpdocs_excerpt_more($more)
 add_filter('excerpt_more', 'wpdocs_excerpt_more');
 
 /**
- * Add scripts and styles.
- *
- *
- * @return void
- */
-
-/**
- * Whether the current request renders something that uses Splide: a carousel block in the current post, or the
- * footer locations carousel (same conditions as footer.php: section visible and more than one office).
- *
- * @return bool
+ * Whether the current request renders a Splide carousel block, in the post content (synced patterns included)
+ * or in a sidebar block widget. No theme template uses Splide outside these blocks.
  */
 function growthlabseotheme01_request_uses_splide()
 {
-    $splide_blocks = array(
-        'acf/office-locations',
-        'acf/logos-carousel',
-        'acf/posts-carousel',
-        'acf/selling-points',
-        'acf/trust-cards',
-    );
+    // Blocks of this theme that render a carousel (theme-config.php)
+    $splide_blocks = (array) apply_filters('growthlabseotheme01_splide_blocks', (array) theme_get_config('splide_blocks'));
 
+    $contains_splide_block = function ($content) use ($splide_blocks) {
+        foreach ($splide_blocks as $block_name) {
+            if (str_contains((string) $content, '<!-- wp:' . $block_name . ' ')) return true;
+        }
+        return false;
+    };
+
+    // Blocks of the request, synced patterns included
+    $uses_splide = false;
     foreach (get_current_post_blocks() as $block) {
-        if (in_array($block['blockName'], $splide_blocks, true)) {
-            return true;
+        if (in_array($block['blockName'] ?? '', $splide_blocks, true)) {
+            $uses_splide = true;
+            break;
         }
     }
 
-    $es = filterContentByLanguage() ? '_es' : '';
-    $options = get_field_options('options' . $es);
-    $options = fill_acf_group_defaults($options, 'options', 'option');
-    $locations_section = $options['locations_section'] ?? array();
+    // Carousel blocks placed in the sidebars as block widgets
+    if (!$uses_splide) {
+        $widget_blocks = get_option('widget_block', []);
+        foreach (wp_get_sidebars_widgets() as $sidebar_id => $widget_ids) {
+            if ($sidebar_id === 'wp_inactive_widgets' || !is_array($widget_ids)) continue;
 
-    return empty($locations_section['hide_section'])
-        && !get_page_field('hide_locations_section')
-        && !empty($options['offices'])
-        && count($options['offices']) > 1;
+            foreach ($widget_ids as $widget_id) {
+                if (!preg_match('/^block-(\d+)$/', $widget_id, $matches)) continue;
+                if ($contains_splide_block($widget_blocks[$matches[1]]['content'] ?? '')) {
+                    $uses_splide = true;
+                    break 2;
+                }
+            }
+        }
+    }
+
+    // Lets a theme or a child theme add its own carousels (e.g. one in the footer)
+    return (bool) apply_filters('growthlabseotheme01_request_uses_splide', $uses_splide);
 }
 
 /**
@@ -332,71 +354,61 @@ add_action('template_redirect', 'theme_start_card_css_buffer', PHP_INT_MAX);
 
 function inline_main_critical_css()
 {
-    // Block CSS files per block type, collected on wp_enqueue_scripts (theme-functions/acf-functions.php)
+    // CSS files of the blocks used on the page, grouped by block type (collected on wp_enqueue_scripts)
     global $block_critical_css_files;
-    $block_files = is_array($block_critical_css_files) ? $block_critical_css_files : array();
+    $block_css_files = !empty($block_critical_css_files) ? $block_critical_css_files : array();
 
     // Dynamic Fonts
-    $fonts_css = function_exists('theme_get_fonts_css') ? theme_get_fonts_css() : '';
+    $fonts_css = theme_get_fonts_css();
 
     // Dynamic Color Scheme
-    $color_scheme = function_exists('theme_get_customizer_css') ? theme_get_customizer_css() : '';
+    $color_scheme = theme_get_customizer_css();
 
     $main_css_file = get_template_directory() . "/styles/main-min.css";
-    $style_css = get_stylesheet_directory() . '/style.css';
+    $style_css_file = get_stylesheet_directory() . '/style.css';
+
     // Compiled styles of the child theme (its styles/main.scss, built with this theme's gulpfile), printed between
     // the parent styles and the child's style.css
     $child_css_file = is_child_theme() ? get_stylesheet_directory() . '/styles/main-min.css' : '';
     if ($child_css_file && !file_exists($child_css_file)) $child_css_file = '';
-    $splide_css_file = get_template_directory() . '/styles/vendor/splide/splide-core.min.css';
-    // Splide critical CSS is only added when carousels are present
-    $include_splide = growthlabseotheme01_request_uses_splide() && file_exists($splide_css_file);
-    $theme_uri = get_template_directory_uri();
 
-    // The cache key covers everything the output depends on: theme URI, file mtimes, included files and dynamic CSS
+    // Add Splide critical CSS only when carousels are present
+    $splide_css_file = get_template_directory() . '/styles/vendor/splide/splide-core.min.css';
+    $include_splide = file_exists($splide_css_file) && growthlabseotheme01_request_uses_splide();
+
+    // Cache the final CSS, keyed by everything that affects it
     $hero_css_files = theme_get_hero_css_files();
-    $files = array_filter(array_merge(array($main_css_file), $hero_css_files, array($child_css_file, $style_css)));
+    $files = array_filter(array_merge(array($main_css_file), $hero_css_files, array($child_css_file, $style_css_file)));
     if ($include_splide) $files[] = $splide_css_file;
-    foreach ($block_files as $type_files) {
-        foreach ($type_files as $file) $files[] = $file;
+    foreach ($block_css_files as $type_files) {
+        $files = array_merge($files, $type_files);
     }
-    $mtimes = array();
+
+    $file_mtimes = array();
     foreach ($files as $file) {
-        $mtimes[$file] = file_exists($file) ? filemtime($file) : 0;
+        $file_mtimes[$file] = @filemtime($file);
     }
+
     $cache_key = 'growthlabseotheme01_critical_css_' . md5(serialize(array(
         // This file builds the CSS, so changing it invalidates the cache too
         @filemtime(__FILE__),
-        $theme_uri,
+        get_template_directory_uri(),
         get_stylesheet_directory_uri(),
-        $mtimes,
-        $block_files,
+        $file_mtimes,
+        $block_css_files,
         $include_splide,
-        md5(serialize(array($fonts_css, $color_scheme))),
+        md5($fonts_css . $color_scheme),
     )));
 
     // Customizer previews change fonts/colors on every refresh, so don't fill the cache from them
     $use_cache = !is_customize_preview();
     $critical_css = $use_cache ? get_transient($cache_key) : false;
 
-    if (!is_string($critical_css)) {
-        $critical_css = '';
-        if (file_exists($main_css_file)) {
-            $critical_css .= file_get_contents($main_css_file);
-        }
-        foreach ($hero_css_files as $hero_css_file) {
-            $critical_css .= file_get_contents($hero_css_file);
-        }
-
-        if ($child_css_file) {
-            $critical_css .= file_get_contents($child_css_file);
-        }
-
-        // Add theme stylesheet
-        if (file_exists($style_css)) {
-            $critical_css .= file_get_contents($style_css);
-        }
-
+    if (false === $critical_css) {
+        $critical_css = file_get_contents($main_css_file);
+        foreach ($hero_css_files as $hero_css_file) $critical_css .= file_get_contents($hero_css_file);
+        if ($child_css_file) $critical_css .= file_get_contents($child_css_file);
+        $critical_css .= file_get_contents($style_css_file);
         $critical_css = $fonts_css . $color_scheme . $critical_css;
 
         if ($include_splide) {
@@ -406,21 +418,23 @@ function inline_main_critical_css()
         // Styles of the cards the page renders, filled in by theme_start_card_css_buffer()
         $critical_css .= "\n" . THEME_CARD_CSS_PLACEHOLDER . "\n";
 
-        // Add block critical CSS if any, wrapping each block type in a comment for debugging
+        // Add block critical CSS if any
         $block_critical_css = '';
-        foreach ($block_files as $type => $type_files) {
+        foreach ($block_css_files as $type => $type_files) {
+            // Wrap type CSS in a comment for debugging
             $block_critical_css .= "/* Block type: {$type} */\n";
             foreach ($type_files as $file) {
                 $block_critical_css .= file_get_contents($file) . "\n";
             }
         }
+
         if (!empty($block_critical_css)) {
             $critical_css .= "\n/* Block Critical CSS */\n" . $block_critical_css;
         }
 
         // The CSS is inline, so relative url()s would resolve against the page: theme assets use these placeholders
         $critical_css = str_replace('{child-theme-path}', get_stylesheet_directory_uri(), $critical_css);
-        $critical_css = preg_replace('/\{theme-path\}/', $theme_uri, $critical_css);
+        $critical_css = preg_replace('/\{theme-path\}/', get_template_directory_uri(), $critical_css);
         // Minify CSS: remove comments, extra spaces, and newlines
         $critical_css = preg_replace('/\/\*.*?\*\//s', '', $critical_css); // Remove CSS comments
         $critical_css = preg_replace('/\s+/', ' ', $critical_css); // Collapse whitespace runs into one space
@@ -434,6 +448,8 @@ function inline_main_critical_css()
 
     echo '<style id="main-css">' . $critical_css . '</style>';
 }
+// After the stylesheets WordPress prints at priority 8 (core block styles, global styles, page templates), so the
+// theme styles win over them
 add_action('wp_head', 'inline_main_critical_css', 10);
 
 function growthlabseotheme01_scripts()
@@ -463,14 +479,14 @@ function growthlabseotheme01_scripts()
         true
     );
     wp_script_add_data('growthlabseotheme01-main-scripts', 'strategy', 'defer');
-    wp_localize_script('growthlabseotheme01-main-scripts', 'siteData', [
+    wp_localize_script('growthlabseotheme01-main-scripts', 'siteData', apply_filters('theme_main_script_data', [
         'homeURL' => home_url(),
         // Printed inside HTML attributes by main.js
         'i18n' => [
-            'closeVideo'  => esc_attr(get_bilingual_text(__('Close video', 'growthlabseotheme01'), 'Cerrar video')),
-            'videoDialog' => esc_attr(get_bilingual_text(__('Video player', 'growthlabseotheme01'), 'Reproductor de video')),
+            'closeVideo'  => esc_attr__('Close video', 'growthlabseotheme01'),
+            'videoDialog' => esc_attr__('Video player', 'growthlabseotheme01'),
         ],
-    ]);
+    ]));
 
     // Styled select fields.
     wp_enqueue_script(
@@ -481,21 +497,19 @@ function growthlabseotheme01_scripts()
         true
     );
     wp_script_add_data('growthlabseotheme01-styled-select-fields', 'strategy', 'defer');
-    wp_localize_script('growthlabseotheme01-styled-select-fields', 'styledSelectData', [
-        'placeholder' => get_bilingual_text(__('Select an option', 'growthlabseotheme01'), 'Selecciona una opción'),
-    ]);
+    wp_localize_script('growthlabseotheme01-styled-select-fields', 'styledSelectData', apply_filters('theme_styled_select_data', [
+        'placeholder' => __('Select an option', 'growthlabseotheme01'),
+    ]));
 
     // Picture Optimization scripts.
-    if (file_exists(get_template_directory() . '/js/picture-optimization-min.js')) {
-        wp_enqueue_script(
-            'growthlabseotheme01-picture-optimization',
-            get_template_directory_uri() . '/js/picture-optimization-min.js',
-            array(),
-            filemtime(get_template_directory() . '/js/picture-optimization-min.js'),
-            true
-        );
-        wp_script_add_data('growthlabseotheme01-picture-optimization', 'strategy', 'defer');
-    }
+    wp_enqueue_script(
+        'growthlabseotheme01-picture-optimization',
+        get_template_directory_uri() . '/js/picture-optimization-min.js',
+        array(),
+        filemtime(get_template_directory() . '/js/picture-optimization-min.js'),
+        true
+    );
+    wp_script_add_data('growthlabseotheme01-picture-optimization', 'strategy', 'defer');
 
     // Child theme scripts (its js/main.js, built with this theme's gulpfile)
     $child_js_file = get_stylesheet_directory() . '/js/main-min.js';
@@ -515,6 +529,9 @@ function growthlabseotheme01_scripts()
         'url' => get_template_directory_uri() . '/js/vendor/splide/splide-min.js',
     ]);
 
+    // IMask is registered here and enqueued only when a rendered form has a phone field (see gform_enqueue_scripts below)
+    growthlabseotheme01_register_imask();
+
     // Load specific template stylesheet
     if (is_page() || is_single()) {
         if (!is_page_template('page-templates/template-full-width.php')) {
@@ -528,9 +545,94 @@ function growthlabseotheme01_scripts()
         wp_enqueue_style('growthlabseotheme01-template-default', get_template_directory_uri() . '/styles/page-templates/template-default-min.css', array(),  filemtime(get_template_directory() . '/styles/page-templates/template-default-min.css'));
         wp_enqueue_style('growthlabseotheme01-blog', get_template_directory_uri() . '/styles/page-templates/template-blog-min.css', array(),  filemtime(get_template_directory() . '/styles/page-templates/template-blog-min.css'));
     }
+    if (is_listing_page() && file_exists(get_template_directory() . '/js/posts-filters-min.js')) {
+        wp_enqueue_script(
+            'growthlabseotheme01-posts-filters',
+            get_template_directory_uri() . '/js/posts-filters-min.js',
+            array(),
+            filemtime(get_template_directory() . '/js/posts-filters-min.js'),
+            ["strategy" => "defer", "in_footer" => true]
+        );
+        wp_localize_script(
+            'growthlabseotheme01-posts-filters',
+            'postsFiltersData',
+            array(
+                'restUrl' => get_rest_url(null, 'wp/v2'),
+                // Same page size as the server-rendered listing, so pagination doesn't change after filtering
+                'perPage' => (int) get_option('posts_per_page'),
+                // Default image of the current language, falling back to the base options
+                'defaultImage' => function_exists('get_current_language_options')
+                    ? ((get_current_language_options()['posts_default_image']['url'] ?? '') ?: (get_field_options('options')['posts_default_image']['url'] ?? ''))
+                    : '',
+                'i18n' => array(
+                    'noPosts'       => __('No posts found for the selected filters.', 'growthlabseotheme01'),
+                    'loadError'     => __('Could not load posts. Please try again.', 'growthlabseotheme01'),
+                    'readMore'      => __('Read More', 'growthlabseotheme01'),
+                    /* translators: %s: post title */
+                    'readMoreAbout' => __('Read more about %s', 'growthlabseotheme01'),
+                    /* translators: %s: active filter (search text, category, month or year) */
+                    'removeFilter'  => __('Remove %s', 'growthlabseotheme01'),
+                    'prev'          => __('Prev', 'growthlabseotheme01'),
+                    'next'          => __('Next', 'growthlabseotheme01'),
+                ),
+            )
+        );
+    }
 }
 
 add_action('wp_enqueue_scripts', 'growthlabseotheme01_scripts');
+
+// Blog filters: "pf_month" (1-12) filters the posts REST endpoint by month across every year. The date range
+// parameters of the endpoint can only express a month within a given year.
+add_filter('rest_post_query', function ($args, $request) {
+    $month = (int) $request->get_param('pf_month');
+    if ($month >= 1 && $month <= 12) {
+        $args['date_query'][] = array('month' => $month);
+    }
+    return $args;
+}, 10, 2);
+
+// IMask for Gravity Forms phone fields. Phone inputs are masked on load and again whenever Gravity Forms re-renders a
+// form (AJAX submissions, multi-page forms); data-imask prevents masking an input twice.
+function growthlabseotheme01_register_imask()
+{
+    if (wp_script_is('imask', 'registered')) return;
+    if (!file_exists(get_template_directory() . '/js/vendor/imask/imask-min.js')) return;
+
+    wp_register_script('imask', get_template_directory_uri() . '/js/vendor/imask/imask-min.js', array(), filemtime(get_template_directory() . '/js/vendor/imask/imask-min.js'), true);
+    wp_add_inline_script('imask', "
+        (function () {
+            function maskPhoneInputs() {
+                document.querySelectorAll('.ginput_container_phone input').forEach(function (input) {
+                    if (input.dataset.imask) return;
+                    input.dataset.imask = '1';
+                    IMask(input, { mask: '(000) 000-0000' });
+                });
+            }
+            // The script can run after DOMContentLoaded (it is loaded with the delayed form scripts)
+            function init() {
+                maskPhoneInputs();
+                if (window.jQuery) jQuery(document).on('gform_post_render', maskPhoneInputs);
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+            document.addEventListener('gform/post_render', maskPhoneInputs);
+        })();
+    ");
+}
+
+add_action('gform_enqueue_scripts', function ($form) {
+    foreach ($form['fields'] ?? array() as $field) {
+        if (($field->type ?? '') === 'phone') {
+            growthlabseotheme01_register_imask();
+            wp_enqueue_script('imask');
+            return;
+        }
+    }
+});
 
 // Add theme and parent/child theme classes to body
 add_filter('body_class', function ($classes) {
@@ -541,7 +643,6 @@ add_filter('body_class', function ($classes) {
     }
     return $classes;
 });
-
 
 /**
  * Register widget area.
@@ -577,29 +678,33 @@ function growthlabseotheme01_widgets_init()
         )
     );
 
-    register_sidebar(
-        array(
-            'name'          => esc_html__('Default Sidebar Spanish', 'growthlabseotheme01'),
-            'id'            => 'sidebar-default-es',
-            'description'   => esc_html__('Add widgets here to appear in the page Spanish sidebar.', 'growthlabseotheme01'),
-            'before_widget' => '<div id="%1$s" class="widget %2$s">',
-            'after_widget'  => '</div>',
-            'before_title'  => '<p class="widget-title">',
-            'after_title'   => '</p>',
-        )
-    );
+    if (function_exists('get_languages_map')) {
+        foreach (get_languages_map() as $slug => $language) {
+            register_sidebar(
+                array(
+                    'name'          => sprintf(esc_html__('%s Sidebar', 'growthlabseotheme01'), $language),
+                    'id'            => "sidebar-default-{$slug}",
+                    'description'   => esc_html__('Add widgets here to appear in the page sidebar.', 'growthlabseotheme01'),
+                    'before_widget' => '<div id="%1$s" class="widget %2$s">',
+                    'after_widget'  => '</div>',
+                    'before_title'  => '<p class="widget-title">',
+                    'after_title'   => '</p>',
+                )
+            );
 
-    register_sidebar(
-        array(
-            'name'          => esc_html__('Blog Sidebar Spanish', 'growthlabseotheme01'),
-            'id'            => 'sidebar-blog-es',
-            'description'   => esc_html__('Add widgets here to appear in the Blog Spanish sidebar.', 'growthlabseotheme01'),
-            'before_widget' => '<div id="%1$s" class="widget %2$s">',
-            'after_widget'  => '</div>',
-            'before_title'  => '<p class="widget-title">',
-            'after_title'   => '</p>',
-        )
-    );
+            register_sidebar(
+                array(
+                    'name'          => sprintf(esc_html__('%s Blog Sidebar', 'growthlabseotheme01'), $language),
+                    'id'            => "sidebar-blog-{$slug}",
+                    'description'   => esc_html__('Add widgets here to appear in the Blog sidebar.', 'growthlabseotheme01'),
+                    'before_widget' => '<div id="%1$s" class="widget %2$s">',
+                    'after_widget'  => '</div>',
+                    'before_title'  => '<p class="widget-title">',
+                    'after_title'   => '</p>',
+                )
+            );
+        }
+    }
 }
 
 add_action('widgets_init', 'growthlabseotheme01_widgets_init');
@@ -670,93 +775,94 @@ function import_theme_images_to_folder()
     }
 }
 
-// Run once by visiting: yoursite.com/?import_theme_images=1
+// Run once by visiting: yoursite.com/?import_theme_images=1 (uncomment temporarily). It must not stay available:
+// every run adds the icons to the media library again.
 /* if (isset($_GET['import_theme_images']) && current_user_can('manage_options')) {
     import_theme_images_to_folder();
     wp_die('Images imported to /uploads/theme-icons/!');
 } */
 
-// Force the widget sections to stay available
+// Admin bar links for the theme maintenance actions (nonce protected)
+add_action('admin_bar_menu', function ($wp_admin_bar) {
+    if (!current_user_can('manage_options')) return;
+
+    $wp_admin_bar->add_node([
+        'id'    => 'growthlabseotheme01-tools',
+        'title' => esc_html__('Theme Tools', 'growthlabseotheme01'),
+    ]);
+
+    $wp_admin_bar->add_node([
+        'id'     => 'growthlabseotheme01-clear-block-cache',
+        'parent' => 'growthlabseotheme01-tools',
+        'title'  => esc_html__('Clear block cache', 'growthlabseotheme01'),
+        'href'   => wp_nonce_url(admin_url('index.php?clear_block_cache=1'), 'clear_block_cache'),
+    ]);
+}, 100);
+
+// Sections of the default and blog sidebars (language sidebars included), which the Customizer only shows on pages
+// that display them
+function theme_customizer_sidebar_sections()
+{
+    $sections = [];
+    foreach (array_keys($GLOBALS['wp_registered_sidebars'] ?? []) as $id) {
+        if (str_starts_with($id, 'sidebar-default') || str_starts_with($id, 'sidebar-blog')) {
+            $sections[] = 'sidebar-widgets-' . $id;
+        }
+    }
+    return $sections;
+}
+
+// Keep the widgets panel and the sidebar sections available in the Customizer
 add_action('customize_register', function ($wp_customize) {
-    // Check for and force the widgets panel
     $widgets_panel = $wp_customize->get_panel('widgets');
     if ($widgets_panel) {
         $widgets_panel->active_callback = '__return_true';
     }
 
-    // Force the specific sections to always be active
-    $sidebar_default = $wp_customize->get_section('sidebar-widgets-sidebar-default');
-    if ($sidebar_default) {
-        $sidebar_default->active_callback = '__return_true';
-    }
-
-    $sidebar_blog = $wp_customize->get_section('sidebar-widgets-sidebar-blog');
-    if ($sidebar_blog) {
-        $sidebar_blog->active_callback = '__return_true';
-    }
-
-    $sidebar_default_es = $wp_customize->get_section('sidebar-widgets-sidebar-default-es');
-    if ($sidebar_default_es) {
-        $sidebar_default_es->active_callback = '__return_true';
-    }
-
-    $sidebar_blog_es = $wp_customize->get_section('sidebar-widgets-sidebar-blog-es');
-    if ($sidebar_blog_es) {
-        $sidebar_blog_es->active_callback = '__return_true';
+    foreach (theme_customizer_sidebar_sections() as $section_id) {
+        $section = $wp_customize->get_section($section_id);
+        if ($section) {
+            $section->active_callback = '__return_true';
+        }
     }
 }, 999);
 
-// Prevent the Customizer from dynamically hiding widget sections
+// Prevent the Customizer from hiding them dynamically
 add_action('customize_controls_print_footer_scripts', function () {
 ?>
     <script>
         (function($) {
             wp.customize.bind('ready', function() {
-                // Force the widget panels to stay visible
-                var widgetsPanel = wp.customize.panel('widgets');
-                if (widgetsPanel) {
-                    widgetsPanel.active.set(true);
-
-                    // Prevent it from being hidden
-                    widgetsPanel.active.validate = function() {
+                var keepActive = function(control) {
+                    if (!control) return;
+                    control.active.set(true);
+                    control.active.validate = function() {
                         return true;
                     };
-                }
+                };
 
-                // Force specific sections
-                ['sidebar-widgets-sidebar-default', 'sidebar-widgets-sidebar-blog', 'sidebar-widgets-sidebar-default-es', 'sidebar-widgets-sidebar-blog-es'].forEach(function(sectionId) {
-                    var section = wp.customize.section(sectionId);
-                    if (section) {
-                        section.active.set(true);
-                        section.active.validate = function() {
-                            return true;
-                        };
-                    }
+                keepActive(wp.customize.panel('widgets'));
+                <?= wp_json_encode(theme_customizer_sidebar_sections()) ?>.forEach(function(sectionId) {
+                    keepActive(wp.customize.section(sectionId));
                 });
             });
         })(jQuery);
     </script>
 <?php
 }, 999);
-
-
 // Add dynamic versioning to theme scripts and styles
 add_filter('script_loader_src', 'add_dynamic_version_to_theme_assets', 10, 2);
 add_filter('style_loader_src', 'add_dynamic_version_to_theme_assets', 10, 2);
 
 /**
- * Sets ?ver= to the file's mtime for scripts and styles served from the theme directory, or from the active child
- * theme directory when there is one, so browsers only re-download them when they change.
- *
- * @param string $src    Asset URL.
- * @param string $handle Asset handle.
- * @return string
+ * Version theme scripts and styles by their file mtime, for files in the parent theme
+ * and, when one is active, in the child theme.
  */
 function add_dynamic_version_to_theme_assets($src, $handle)
 {
-    // Child theme first: its directory name usually starts with the parent's, so the parent prefix would match it too
+    // Child theme first, since its URI may start with the parent theme URI
     $theme_dirs = array();
-    if (get_stylesheet_directory() !== get_template_directory()) {
+    if (is_child_theme()) {
         $theme_dirs[get_stylesheet_directory_uri()] = get_stylesheet_directory();
     }
     $theme_dirs[get_template_directory_uri()] = get_template_directory();
@@ -766,6 +872,7 @@ function add_dynamic_version_to_theme_assets($src, $handle)
 
     foreach ($theme_dirs as $theme_dir_uri => $theme_dir) {
         $theme_dir_normalized = preg_replace('(^https?:)', '', $theme_dir_uri);
+
         if (strpos($src_normalized, $theme_dir_normalized . '/') !== 0) continue;
 
         // Extract path without query string
