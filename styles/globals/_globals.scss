@@ -371,6 +371,8 @@ img.bg-image {
   li {
     &::before {
       content: "\25C6";
+      // Decorative: no text for screen readers (browsers without the alt syntax keep the line above)
+      content: "\25C6" / "";
       margin-block: auto;
       margin-right: 8px;
       color: rgb(var(--tertiary));

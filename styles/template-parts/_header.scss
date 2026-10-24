@@ -345,6 +345,8 @@
 
       &::after {
         content: "\25BC";
+        // Decorative: no text for screen readers (browsers without the alt syntax keep the line above)
+        content: "\25BC" / "";
         width: 2.5rem;
         height: 2.5rem;
         position: absolute;
@@ -357,6 +359,8 @@
 
         @media (min-width: v.$tablet) {
           content: "\276F";
+          // Decorative: no text for screen readers (browsers without the alt syntax keep the line above)
+          content: "\276F" / "";
           width: 2rem;
           height: 2rem;
           position: static;
