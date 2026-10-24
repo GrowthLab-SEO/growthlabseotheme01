@@ -251,6 +251,34 @@ function growthlabseotheme01_request_uses_splide()
         && count($options['offices']) > 1;
 }
 
+/**
+ * Hero stylesheets of the current page. The build moves the rules of the homepage hero variants out of
+ * main-min.css into styles/heroes/ (see gulpfile.js), so each page only prints the ones its hero uses.
+ * Filter: theme_hero_css_files (array of file paths, and the hero style).
+ */
+if (!function_exists('theme_get_hero_css_files')) {
+    function theme_get_hero_css_files()
+    {
+        $files_by_style = array(
+            'home'   => array('hero-homepage'),
+            'home_2' => array('hero-v2'),
+            'home_3' => array('hero-v3'),
+            'home_4' => array('hero-homepage', 'hero-v4'),
+            'home_5' => array('hero-v5'),
+            'home_6' => array('hero-homepage', 'hero-v6'),
+        );
+        $hero_style = function_exists('get_page_hero_style') ? get_page_hero_style() : 'default';
+
+        $files = array();
+        foreach ($files_by_style[$hero_style] ?? array() as $name) {
+            $file = get_template_directory() . "/styles/heroes/$name-min.css";
+            if (file_exists($file)) $files[] = $file;
+        }
+
+        return (array) apply_filters('theme_hero_css_files', $files, $hero_style);
+    }
+}
+
 function inline_main_critical_css()
 {
     // Block CSS files per block type, collected on wp_enqueue_scripts (theme-functions/acf-functions.php)
@@ -275,7 +303,8 @@ function inline_main_critical_css()
     $theme_uri = get_template_directory_uri();
 
     // The cache key covers everything the output depends on: theme URI, file mtimes, included files and dynamic CSS
-    $files = array_filter(array($main_css_file, $child_css_file, $style_css));
+    $hero_css_files = theme_get_hero_css_files();
+    $files = array_filter(array_merge(array($main_css_file), $hero_css_files, array($child_css_file, $style_css)));
     if ($include_splide) $files[] = $splide_css_file;
     foreach ($block_files as $type_files) {
         foreach ($type_files as $file) $files[] = $file;
@@ -303,6 +332,9 @@ function inline_main_critical_css()
         $critical_css = '';
         if (file_exists($main_css_file)) {
             $critical_css .= file_get_contents($main_css_file);
+        }
+        foreach ($hero_css_files as $hero_css_file) {
+            $critical_css .= file_get_contents($hero_css_file);
         }
 
         if ($child_css_file) {
