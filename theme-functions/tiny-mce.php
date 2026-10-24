@@ -1,42 +1,61 @@
 <?php
 
 /**
- * Internal helper — builds the sanitized theme color array
- * for use in TinyMCE.
+ * TinyMCE settings of the classic editor and the ACF WYSIWYG fields: theme fonts, font sizes, line heights, the theme
+ * color palette and the toolbar. ACF builds its WYSIWYG editors from the same tiny_mce_before_init settings.
  */
-if (!function_exists('_theme_get_tinymce_color_map')) {
-    function _theme_get_tinymce_color_map(): array
+
+if (!function_exists('_theme_get_tinymce_colors')) {
+    /**
+     * Colors of the Customizer color scheme (defaults in theme-config.php), as hex => name.
+     */
+    function _theme_get_tinymce_colors(): array
     {
-        $colors = [
-            sanitize_hex_color(get_theme_mod('primary_color', '#15253f')) ?: '#15253f' => 'Primary Color',
-            sanitize_hex_color(get_theme_mod('primary_color_dark', '#08182f')) ?: '#08182f' => 'Primary Dark',
-            sanitize_hex_color(get_theme_mod('primary_color_light', '#2C3D5B')) ?: '#2C3D5B' => 'Primary Light',
-            sanitize_hex_color(get_theme_mod('secondary_color', '#F4F3EE')) ?: '#F4F3EE' => 'Secondary Color',
-            sanitize_hex_color(get_theme_mod('secondary_color_dark', '#E7E5DF')) ?: '#E7E5DF' => 'Secondary Dark',
-            sanitize_hex_color(get_theme_mod('secondary_color_light', '#FFFFFF')) ?: '#FFFFFF' => 'Secondary Light',
-            sanitize_hex_color(get_theme_mod('tertiary_color', '#BC9061')) ?: '#BC9061' => 'Tertiary Color',
-            sanitize_hex_color(get_theme_mod('tertiary_color_dark', '#9D7A55')) ?: '#9D7A55' => 'Tertiary Dark',
-            sanitize_hex_color(get_theme_mod('tertiary_color_light', '#DCAB77')) ?: '#DCAB77' => 'Tertiary Light',
-            sanitize_hex_color(get_theme_mod('text_color', '#15253f')) ?: '#15253f' => 'Text Color',
+        global $default_colors;
+
+        $settings = [
+            'primary_color'         => [$default_colors['primary']['default'], __('Primary Color', 'growthlabseotheme01')],
+            'primary_color_dark'    => [$default_colors['primary']['dark'], __('Primary Dark', 'growthlabseotheme01')],
+            'primary_color_light'   => [$default_colors['primary']['light'], __('Primary Light', 'growthlabseotheme01')],
+            'secondary_color'       => [$default_colors['secondary']['default'], __('Secondary Color', 'growthlabseotheme01')],
+            'secondary_color_dark'  => [$default_colors['secondary']['dark'], __('Secondary Dark', 'growthlabseotheme01')],
+            'secondary_color_light' => [$default_colors['secondary']['light'], __('Secondary Light', 'growthlabseotheme01')],
+            'tertiary_color'        => [$default_colors['tertiary']['default'], __('Tertiary Color', 'growthlabseotheme01')],
+            'tertiary_color_dark'   => [$default_colors['tertiary']['dark'], __('Tertiary Dark', 'growthlabseotheme01')],
+            'tertiary_color_light'  => [$default_colors['tertiary']['light'], __('Tertiary Light', 'growthlabseotheme01')],
+            'text_color'            => [$default_colors['text'], __('Text Color', 'growthlabseotheme01')],
         ];
 
-        $map = [];
-        foreach ($colors as $hex => $name) {
-            $map[] = str_replace('#', '', $hex);
-            $map[] = $name;
+        $colors = [];
+        foreach ($settings as $mod => [$default, $name]) {
+            $colors[$mod] = [
+                'name'  => $name,
+                'color' => sanitize_hex_color(get_theme_mod($mod, $default)) ?: $default,
+            ];
         }
+        return $colors;
+    }
+}
 
+if (!function_exists('_theme_get_tinymce_color_map')) {
+    /**
+     * The colors in TinyMCE's textcolor_map format: hex without "#" followed by its name.
+     */
+    function _theme_get_tinymce_color_map(): array
+    {
+        $map = [];
+        foreach (_theme_get_tinymce_colors() as $color) {
+            $map[] = ltrim($color['color'], '#');
+            $map[] = $color['name'];
+        }
         return $map;
     }
 }
 
-/**
- * Internal helper — builds the font_formats string for TinyMCE (same as theme-02/03).
- *
- * Order: theme fonts (theme.json) → custom fonts (Font Library) → system, so the fonts chosen in the
- * Customizer and the ones installed from the Font Library can be used in WYSIWYG fields too.
- */
 if (!function_exists('_theme_get_tinymce_font_formats')) {
+    /**
+     * The font_formats string for TinyMCE. Order: theme fonts (theme.json) → custom fonts (Font Library) → system.
+     */
     function _theme_get_tinymce_font_formats(): string
     {
         $entries = [];
@@ -50,19 +69,22 @@ if (!function_exists('_theme_get_tinymce_font_formats')) {
                 foreach (($families[$source] ?? []) as $font) {
                     $name   = $font['name'] ?? '';
                     $family = $font['fontFamily'] ?? $name;
-                    if (! $name || isset($seen[$name])) {
+                    if (!$name || isset($seen[$name])) {
                         continue;
                     }
 
+                    $family = str_replace('"', '', $family);
                     $seen[$name] = true;
-                    $entries[] = $name . '=' . str_replace('"', '', $family);
+                    $entries[] = "{$name}={$family}";
                 }
             }
         }
 
+        // Without theme.json data, the default fonts of this theme (theme-config.php)
         if (empty($entries)) {
-            $entries[] = 'Open Sans=Open Sans,sans-serif';
-            $entries[] = 'Fraunces=Fraunces,serif';
+            global $default_fonts;
+            $entries[] = "{$default_fonts['primary']}={$default_fonts['primary']},sans-serif";
+            $entries[] = "{$default_fonts['secondary']}={$default_fonts['secondary']},serif";
         }
 
         $entries[] = 'Arial=Arial,Helvetica,sans-serif';
@@ -72,276 +94,127 @@ if (!function_exists('_theme_get_tinymce_font_formats')) {
     }
 }
 
+// Register the line height plugin for TinyMCE
 add_filter('mce_external_plugins', function ($plugins) {
     $plugins['lineheight'] = get_template_directory_uri() . '/js/vendor/tiny-mce/lineheight-min.js';
     return $plugins;
 });
 
-// 1️⃣ Load editor CSS
-function my_acf_editor_styles($mce_css)
-{
-    $editor_style = get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css';
-    $editor_style .= '?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css');
+// Editor CSS
+if (!function_exists('my_acf_editor_styles')) {
+    function my_acf_editor_styles($mce_css)
+    {
+        $editor_style = get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css';
+        $editor_style .= '?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css');
 
-    if (!empty($mce_css)) {
-        $mce_css .= ',' . $editor_style;
-    } else {
-        $mce_css = $editor_style;
+        if (!empty($mce_css)) {
+            $mce_css .= ',' . $editor_style;
+        } else {
+            $mce_css = $editor_style;
+        }
+        return $mce_css;
     }
-    return $mce_css;
 }
 add_filter('mce_css', 'my_acf_editor_styles');
 
-
-// 2️⃣ TinyMCE configuration - For standard WordPress
-function my_acf_wysiwyg_custom_settings($init)
-{
-    $init['font_formats'] = _theme_get_tinymce_font_formats();
-    $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
-    $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
-    $init['plugins'] = trim(($init['plugins'] ?? '') . ' textcolor lineheight');
-
-    return $init;
+// Fonts, font sizes and line heights
+if (!function_exists('my_acf_wysiwyg_custom_settings')) {
+    function my_acf_wysiwyg_custom_settings($init)
+    {
+        $init['font_formats']       = _theme_get_tinymce_font_formats();
+        $init['fontsize_formats']   = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 42px 44px 46px 48px 50px 52px 54px 56px 58px 60px 62px 64px 72px 80px 88px 96px 104px 124px 148px 156px 168px';
+        $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
+        return $init;
+    }
 }
 add_filter('tiny_mce_before_init', 'my_acf_wysiwyg_custom_settings', 1);
 
-
-// 3️⃣ Apply to ACF WYSIWYG - Only fonts and sizes
-function my_acf_tinymce_settings($init, $id)
-{
-    $init['font_formats'] = _theme_get_tinymce_font_formats();
-    $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
-    $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
-    $init['plugins'] = trim(($init['plugins'] ?? '') . ' textcolor lineheight');
-
-    return $init;
-}
-add_filter('acf_wysiwyg_tinymce_settings', 'my_acf_tinymce_settings', 10, 2);
-
-
-// 4️⃣ Custom toolbar
-function my_acf_override_full_toolbar($toolbars)
-{
-    $toolbars['Full'][1] = array(
-        'formatselect',
-        'fontselect',
-        'fontsizeselect',
-        'lineheightselect',
-        'bold',
-        'italic',
-        'underline',
-        'forecolor',
-        'backcolor',
-        'bullist',
-        'numlist',
-        'alignleft',
-        'aligncenter',
-        'alignright',
-        'link',
-        'unlink',
-        'removeformat',
-        'undo',
-        'redo'
-    );
-    return $toolbars;
+// Toolbar of the ACF WYSIWYG fields
+if (!function_exists('my_acf_override_full_toolbar')) {
+    function my_acf_override_full_toolbar($toolbars)
+    {
+        $toolbars['Full'][1] = [
+            'formatselect',
+            'fontselect',
+            'fontsizeselect',
+            'lineheightselect',
+            'bold',
+            'italic',
+            'underline',
+            'forecolor',
+            'backcolor',
+            'bullist',
+            'numlist',
+            'alignleft',
+            'aligncenter',
+            'alignright',
+            'link',
+            'unlink',
+            'removeformat',
+            'undo',
+            'redo',
+        ];
+        return $toolbars;
+    }
 }
 add_filter('acf/fields/wysiwyg/toolbars', 'my_acf_override_full_toolbar');
 
-
-// 5️⃣ Inject colors dynamically with JavaScript
-if (!function_exists('my_acf_tinymce_colors_script')) {
-    function my_acf_tinymce_colors_script()
-    {
-        $colors_json = wp_json_encode(_theme_get_tinymce_color_map());
-?>
-        <script type="text/javascript">
-            (function($) {
-                var customColors = <?php echo $colors_json; ?>;
-
-                acf.addFilter('wysiwyg_tinymce_settings', function(mceInit, id, field) {
-                    mceInit.textcolor_map = customColors;
-                    mceInit.textcolor_cols = 5;
-                    return mceInit;
-                });
-
-            })(jQuery);
-        </script>
-    <?php
-    }
-}
-add_action('acf/input/admin_head', 'my_acf_tinymce_colors_script');
-
-// 6️⃣ Inject colors directly into the TinyMCE configuration
+// Theme colors in the text and background color pickers. WordPress prints string settings that start with "[" as
+// JavaScript literals, so the map is passed as JSON (an array would be printed as the text "Array").
 if (!function_exists('my_wp_editor_colors_direct')) {
     function my_wp_editor_colors_direct($init)
     {
-        $init['textcolor_map']  = _theme_get_tinymce_color_map();
+        $init['textcolor_map']  = wp_json_encode(_theme_get_tinymce_color_map());
         $init['textcolor_cols'] = 5;
         return $init;
     }
 }
 add_filter('tiny_mce_before_init', 'my_wp_editor_colors_direct', 10);
 
-// 7️⃣ Configure WordPress editor with same fonts and sizes
-function my_wp_editor_formats()
-{
-    add_editor_style(get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css'));
+// Editor styles and the color palette of the block editor
+if (!function_exists('my_wp_editor_formats')) {
+    function my_wp_editor_formats()
+    {
+        add_editor_style(get_template_directory_uri() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css?ver=' . filemtime(get_template_directory() . '/styles/vendor/tiny-mce/tiny-mce-styles-min.css'));
 
-    // Add support for custom formats
-    add_theme_support('editor-color-palette', array(
-        array(
-            'name'  => __('Primary Color', 'growthlabseotheme01'),
-            'slug'  => 'primary',
-            'color' => sanitize_hex_color(get_theme_mod('primary_color', '#15253f')) ?: '#15253f',
-        ),
-        array(
-            'name'  => __('Primary Dark', 'growthlabseotheme01'),
-            'slug'  => 'primary-dark',
-            'color' => sanitize_hex_color(get_theme_mod('primary_color_dark', '#08182f')) ?: '#08182f',
-        ),
-        array(
-            'name'  => __('Primary Light', 'growthlabseotheme01'),
-            'slug'  => 'primary-light',
-            'color' => sanitize_hex_color(get_theme_mod('primary_color_light', '#2C3D5B')) ?: '#2C3D5B',
-        ),
-        array(
-            'name'  => __('Secondary Color', 'growthlabseotheme01'),
-            'slug'  => 'secondary',
-            'color' => sanitize_hex_color(get_theme_mod('secondary_color', '#F4F3EE')) ?: '#F4F3EE',
-        ),
-        array(
-            'name'  => __('Secondary Dark', 'growthlabseotheme01'),
-            'slug'  => 'secondary-dark',
-            'color' => sanitize_hex_color(get_theme_mod('secondary_color_dark', '#E7E5DF')) ?: '#E7E5DF',
-        ),
-        array(
-            'name'  => __('Secondary Light', 'growthlabseotheme01'),
-            'slug'  => 'secondary-light',
-            'color' => sanitize_hex_color(get_theme_mod('secondary_color_light', '#FFFFFF')) ?: '#FFFFFF',
-        ),
-        array(
-            'name'  => __('Tertiary Color', 'growthlabseotheme01'),
-            'slug'  => 'tertiary',
-            'color' => sanitize_hex_color(get_theme_mod('tertiary_color', '#BC9061')) ?: '#BC9061',
-        ),
-        array(
-            'name'  => __('Tertiary Dark', 'growthlabseotheme01'),
-            'slug'  => 'tertiary-dark',
-            'color' => sanitize_hex_color(get_theme_mod('tertiary_color_dark', '#9D7A55')) ?: '#9D7A55',
-        ),
-        array(
-            'name'  => __('Tertiary Light', 'growthlabseotheme01'),
-            'slug'  => 'tertiary-light',
-            'color' => sanitize_hex_color(get_theme_mod('tertiary_color_light', '#DCAB77')) ?: '#DCAB77',
-        ),
-        array(
-            'name'  => __('Text Color', 'growthlabseotheme01'),
-            'slug'  => 'text',
-            'color' => sanitize_hex_color(get_theme_mod('text_color', '#15253f')) ?: '#15253f',
-        ),
-    ));
+        $slugs = [
+            'primary_color'         => 'primary',
+            'primary_color_dark'    => 'primary-dark',
+            'primary_color_light'   => 'primary-light',
+            'secondary_color'       => 'secondary',
+            'secondary_color_dark'  => 'secondary-dark',
+            'secondary_color_light' => 'secondary-light',
+            'tertiary_color'        => 'tertiary',
+            'tertiary_color_dark'   => 'tertiary-dark',
+            'tertiary_color_light'  => 'tertiary-light',
+            'text_color'            => 'text',
+        ];
+
+        $palette = [];
+        foreach (_theme_get_tinymce_colors() as $mod => $color) {
+            $palette[] = ['name' => $color['name'], 'slug' => $slugs[$mod], 'color' => $color['color']];
+        }
+        add_theme_support('editor-color-palette', $palette);
+    }
 }
 add_action('after_setup_theme', 'my_wp_editor_formats');
 
-// 8️⃣ Set default font and size for WordPress editor
-function my_wp_editor_default_settings($init)
-{
-    // Font formats (same as ACF)
-    $init['font_formats'] = _theme_get_tinymce_font_formats();
+// Toolbar of the classic editor, and the plugins of the settings above
+if (!function_exists('my_wp_editor_default_settings')) {
+    function my_wp_editor_default_settings($init)
+    {
+        $init['font_formats']       = _theme_get_tinymce_font_formats();
+        $init['fontsize_formats']   = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 42px 44px 46px 48px 50px 52px 54px 56px 58px 60px 62px 64px 72px 80px 88px 96px 104px 124px 148px 156px 168px';
+        $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
+        $init['toolbar1']           = 'formatselect,fontselect,fontsizeselect,lineheightselect,bold,italic,underline,forecolor,backcolor,bullist,numlist,alignleft,aligncenter,alignright,link,unlink,removeformat,undo,redo';
+        $init['toolbar2']           = '';
+        // The theme colors when another filter removed them
+        if (empty($init['textcolor_map'])) $init['textcolor_map'] = wp_json_encode(_theme_get_tinymce_color_map());
+        $init['textcolor_cols']     = 5;
 
-    // Font sizes (same as ACF)
-    $init['fontsize_formats'] = '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 40px 48px';
-    $init['lineheight_formats'] = '.5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 2 2.5 3';
-
-    // Toolbar configuration (same buttons as ACF)
-    $init['toolbar1'] = 'formatselect,fontselect,fontsizeselect,lineheightselect,bold,italic,underline,forecolor,backcolor,bullist,numlist,alignleft,aligncenter,alignright,link,unlink,removeformat,undo,redo';
-    $init['toolbar2'] = '';
-
-    $init['textcolor_map'] = ! empty($init['textcolor_map']) ? $init['textcolor_map'] : _theme_get_tinymce_color_map();
-    $init['textcolor_cols'] = 5;
-    $init['plugins'] = trim((isset($init['plugins']) ? $init['plugins'] : '') . ' textcolor lineheight');
-
-    return $init;
+        $plugins = array_filter(explode(' ', str_replace(',', ' ', (string) ($init['plugins'] ?? ''))));
+        $init['plugins'] = implode(',', array_unique(array_merge($plugins, ['textcolor', 'lineheight'])));
+        return $init;
+    }
 }
 add_filter('tiny_mce_before_init', 'my_wp_editor_default_settings', 20);
-
-// Inject colors directly into each TinyMCE instance when it is created (more reliable)
-function my_wp_editor_colors_apply_on_add()
-{
-    $map_json = wp_json_encode(_theme_get_tinymce_color_map());
-    ?>
-    <script type="text/javascript">
-    (function($){
-        var customColors = <?php echo $map_json; ?>;
-        var customCols = 5;
-
-        function applyToEditor(editor) {
-            if (!editor || !editor.settings) return;
-            try {
-                editor.settings.textcolor_map = customColors;
-                editor.settings.textcolor_cols = customCols;
-
-                // Force a state update and try to refresh the UI
-                try {
-                    editor.nodeChanged();
-                } catch (err) { /* not critical */ }
-
-                // If the forecolor button exists, try to force the menu to rebuild
-                try {
-                    var btn = editor.ui.registry.getAll && editor.ui && editor.ui.registry && editor.ui.registry.getAll && editor.ui.registry.getAll().buttons && editor.ui.registry.getAll().buttons.forecolor;
-                    if (btn && typeof btn.onAction === 'function') {
-                        // We can't easily rebuild the plugin internals from here,
-                        // but with editor.settings updated the next time the picker opens it should use them.
-                    }
-                } catch (e) {}
-            } catch (e) {
-                console.error('[growthlab] applyToEditor error', e);
-            }
-        }
-
-        // If tinymce is already loaded
-        if (window.tinymce && window.tinymce.EditorManager) {
-            // Apply to editors that already exist
-            for (var id in tinymce.editors) {
-                if (tinymce.editors.hasOwnProperty(id)) {
-                    applyToEditor(tinymce.editors[id]);
-                }
-            }
-
-            // Apply to new editors as they are added
-            if (tinymce.EditorManager.on) {
-                tinymce.EditorManager.on('AddEditor', function(e){
-                    applyToEditor(e.editor);
-                });
-            } else if (tinymce.on) {
-                tinymce.on('AddEditor', function(e){
-                    applyToEditor(e.editor);
-                });
-            }
-        } else {
-            // If tinymce isn't there yet, wait and apply once it is ready
-            var wait = setInterval(function(){
-                if (window.tinymce && tinymce.EditorManager) {
-                    clearInterval(wait);
-                    for (var id2 in tinymce.editors) {
-                        if (tinymce.editors.hasOwnProperty(id2)) {
-                            applyToEditor(tinymce.editors[id2]);
-                        }
-                    }
-                    if (tinymce.EditorManager.on) {
-                        tinymce.EditorManager.on('AddEditor', function(e){
-                            applyToEditor(e.editor);
-                        });
-                    } else if (tinymce.on) {
-                        tinymce.on('AddEditor', function(e){
-                            applyToEditor(e.editor);
-                        });
-                    }
-                }
-            }, 250);
-        }
-    })(jQuery);
-    </script>
-    <?php
-}
-add_action('admin_print_footer_scripts', 'my_wp_editor_colors_apply_on_add', 999);
