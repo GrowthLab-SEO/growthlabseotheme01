@@ -35,6 +35,7 @@ $includes = [
     'theme-functions/picture-optimization.php',
     'theme-functions/tiny-mce.php',
     'theme-functions/security-functions.php',
+    'theme-functions/theme-hooks.php', // behavior only this theme has
 ];
 
 foreach ($includes as $file) {

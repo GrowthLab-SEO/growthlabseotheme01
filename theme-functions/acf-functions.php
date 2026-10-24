@@ -6,8 +6,8 @@
 if (!function_exists('theme_blocks_category')) {
     function theme_blocks_category($categories, $post)
     {
-        $theme      = wp_get_theme();
-        $theme_name = $theme->get('Name');
+        $parent     = wp_get_theme(get_template());
+        $theme_name = $parent->get('Name');
         $theme_slug = get_template();
 
         return array_merge(
@@ -27,11 +27,11 @@ add_filter('block_categories_all', 'theme_blocks_category', 10, 2);
 if (!function_exists('register_acf_blocks')) {
     function register_acf_blocks()
     {
-        $cache_key = 'theme_block_files_cache_' . get_stylesheet();
-        $hash_key  = 'theme_block_files_hash_' . get_stylesheet();
+        $cache_key    = 'theme_block_files_cache_' . get_stylesheet();
+        $hash_key     = 'theme_block_files_hash_'  . get_stylesheet();
 
         $block_json_files = array_merge(
-            glob(get_template_directory() . '/blocks/*/block.json') ?: [],
+            glob(get_template_directory()   . '/blocks/*/block.json') ?: [],
             glob(get_stylesheet_directory() . '/blocks/*/block.json') ?: []
         );
 
@@ -44,7 +44,10 @@ if (!function_exists('register_acf_blocks')) {
             delete_transient($cache_key);
         }
 
-        // Manual cache clear requires an admin and a valid nonce (see the admin bar link below)
+        // Force a rebuild during local development if the block cache is stale or if
+        // the admin requests a cache clear. This helps ensure updated block.json
+        // metadata is picked up immediately. The manual clear requires a valid nonce
+        // (see the "Clear block cache" admin bar link).
         $clear_requested = isset($_GET['clear_block_cache'])
             && current_user_can('manage_options')
             && wp_verify_nonce($_GET['_wpnonce'] ?? '', 'clear_block_cache');
@@ -73,8 +76,8 @@ if (!function_exists('register_acf_blocks')) {
                 }
             }
 
-            set_transient($cache_key, $block_files, 24 * HOUR_IN_SECONDS);
-            set_transient($hash_key, $current_hash, 24 * HOUR_IN_SECONDS);
+            set_transient($cache_key,  $block_files,   24 * HOUR_IN_SECONDS);
+            set_transient($hash_key,   $current_hash,  24 * HOUR_IN_SECONDS);
         }
 
         global $acf_block_dirs;
@@ -86,7 +89,7 @@ if (!function_exists('register_acf_blocks')) {
     }
 }
 
-// switch_theme runs after the switch, so get_stylesheet() is already the new theme: clear the caches of both themes
+// Clear the block cache on theme switch. switch_theme runs after the switch, so get_stylesheet() is already the new theme: clear the caches of both themes
 add_action('switch_theme', function ($new_name, $new_theme, $old_theme) {
     foreach (array($new_theme, $old_theme) as $theme) {
         if (!$theme instanceof WP_Theme) continue;
@@ -95,19 +98,8 @@ add_action('switch_theme', function ($new_name, $new_theme, $old_theme) {
     }
 }, 10, 3);
 
-add_action('init', 'register_acf_blocks', 5);
-
-// Admin bar link to clear the block files cache (nonce protected)
-add_action('admin_bar_menu', function ($wp_admin_bar) {
-    if (!current_user_can('manage_options')) return;
-
-    $wp_admin_bar->add_node(array(
-        'id'    => 'clear-block-cache',
-        'title' => __('Clear Block Cache', get_template()),
-        'href'  => wp_nonce_url(add_query_arg('clear_block_cache', '1', admin_url()), 'clear_block_cache'),
-    ));
-}, 100);
-
+// After WordPress and plugins register their blocks and supports on init (default priority 10)
+add_action('init', 'register_acf_blocks', 11);
 
 /**
  * Load block assets only when block is present on the page
@@ -124,7 +116,7 @@ add_filter('should_load_separate_core_block_assets', '__return_true');
  * MODIFIED: Inline critical CSS for used blocks instead of enqueuing separate files
  */
 add_action('wp_enqueue_scripts', function () {
-    // Blocks of the current singular post, including inner blocks (parsed once per request)
+    // Blocks of the current request, inner blocks and synced patterns included (parsed once per request)
     $blocks = get_current_post_blocks();
     if (empty($blocks)) return;
 
@@ -144,14 +136,14 @@ add_action('wp_enqueue_scripts', function () {
     // Group blocks by type (e.g., 'posts-carousel' for 'acf/posts-carousel')
     $blocks_by_type = array();
     foreach ($blocks_in_use as $block_name) {
-        $type = str_replace('acf/', '', $block_name);
+        $type = str_replace('acf/', '', $block_name); // Extract type from 'acf/type-name'
         if (!isset($blocks_by_type[$type])) {
             $blocks_by_type[$type] = array();
         }
         $blocks_by_type[$type][] = $block_name;
     }
 
-    // Collect the CSS files per type; inline_main_critical_css() reads them only when its cached CSS is stale
+    // Collect the CSS files per type; inline_main_critical_css() reads and combines them
     global $block_critical_css_files;
     $block_critical_css_files = array();
 
@@ -211,7 +203,6 @@ add_action('wp_enqueue_scripts', function () {
     }
 }, 5);
 
-
 /**
  * Remove style links for blocks that have CSS inlined
  */
@@ -237,7 +228,7 @@ add_filter('style_loader_tag', function ($tag, $handle) {
         if (str_starts_with($base_handle, 'acf-')) {
             $block_name = 'acf/' . str_replace(['acf-', '-style'], '', $base_handle);
             if (in_array($block_name, $blocks_in_use_css, true)) {
-                return '';
+                return ''; // Remove the inline <style> block
             }
         }
     }
@@ -248,17 +239,15 @@ add_filter('style_loader_tag', function ($tag, $handle) {
         $block_name = 'acf/' . $block_name;
 
         if (in_array($block_name, $blocks_in_use_css, true)) {
-            return '';
+            return ''; // Remove the <link> tag
         }
     }
 
     return $tag;
 }, 10, 2);
 
-
 /**
- * Move block scripts to footer (only for blocks actually in use)
- * OPTIMIZED: Only process registered block scripts, not all scripts
+ * Move block scripts to footer
  */
 add_action('wp_enqueue_scripts', function () {
     global $wp_scripts;
@@ -277,7 +266,6 @@ add_action('wp_enqueue_scripts', function () {
     }
 }, 999);
 
-
 // Add ACF Options Page. Registered on acf/init (ACF's documented hook); the capability setting limits it to admins.
 add_action('acf/init', function () {
     if (!function_exists('acf_add_options_page')) return;
@@ -291,7 +279,6 @@ add_action('acf/init', function () {
         'redirect'   => false
     ));
 });
-
 
 if (!function_exists('my_acf_json_save_point')) {
     function my_acf_json_save_point($path)
@@ -325,7 +312,6 @@ if (!function_exists('my_acf_json_load_point')) {
 
 add_filter('acf/settings/save_json', 'my_acf_json_save_point');
 add_filter('acf/settings/load_json', 'my_acf_json_load_point');
-
 
 /**
  * Synchronize ACF Fields after theme updates (CI/CD Integration)
@@ -547,7 +533,6 @@ $acf_sync = function () use ($_theme_dir) {
 add_action('wppusher_theme_was_updated',   $acf_sync);
 add_action('wppusher_theme_was_installed', $acf_sync);
 
-
 // Allow HTML in ACF fields
 add_filter('acf/shortcode/allow_unsafe_html', function () {
     return true;
@@ -563,16 +548,13 @@ if (is_admin()) {
     add_filter('acf/admin/prevent_escaped_html_notice', '__return_true');
 }
 
-
 /**
  * ACF Color Picker Custom Palette
- * Adds custom color palette from Customizer to all ACF color picker fields
  */
-
 if (!function_exists('get_theme_color_palette_for_acf')) {
     function get_theme_color_palette_for_acf()
     {
-        // Use the Customizer colors with the defaults from color-scheme.php so both always match
+        // Use the Customizer colors with the same defaults as color-scheme.php so both always match
         global $default_colors;
 
         return array(
@@ -593,8 +575,8 @@ if (!function_exists('get_theme_color_palette_for_acf')) {
 if (!function_exists('acf_color_picker_palette_script')) {
     function acf_color_picker_palette_script()
     {
-        $colors       = get_theme_color_palette_for_acf();
-        $palette      = array_column($colors, 'color');
+        $colors  = get_theme_color_palette_for_acf();
+        $palette = array_column($colors, 'color');
         $palette_json = json_encode($palette);
 ?>
         <script type="text/javascript">
@@ -619,7 +601,6 @@ if (!function_exists('acf_color_picker_palette_script')) {
     }
 }
 add_action('acf/input/admin_head', 'acf_color_picker_palette_script');
-
 
 // NOTE: The google_maps_embed_code field stores values with a base64: prefix.
 // Encoding happens client-side (acf/input/admin_footer) before saving
@@ -681,32 +662,4 @@ add_action('acf/input/admin_footer', function () {
         });
     </script>
 <?php
-});
-
-// One-time migration of the hero title tag. Its default was "p" and the selector was ignored for a while (every hero
-// title printed as h1), so most pages saved "p" without anyone choosing it. Turn those values into h1 once, so the
-// restored selector doesn't remove the page h1; h2-h6 and later choices of "p" are kept.
-add_action('init', function () {
-    $option = 'growthlabseotheme01_hero_title_tag_h1_migration';
-    if (get_option($option)) return;
-
-    global $wpdb;
-    $post_ids = $wpdb->get_col($wpdb->prepare(
-        "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
-        'hero_properties_hero_title_tag',
-        'p'
-    ));
-
-    if ($post_ids) {
-        $wpdb->update(
-            $wpdb->postmeta,
-            array('meta_value' => 'h1'),
-            array('meta_key' => 'hero_properties_hero_title_tag', 'meta_value' => 'p')
-        );
-        foreach ($post_ids as $post_id) {
-            wp_cache_delete((int) $post_id, 'post_meta');
-        }
-    }
-
-    update_option($option, gmdate('c'), true);
 });
