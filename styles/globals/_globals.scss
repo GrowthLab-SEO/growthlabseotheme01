@@ -368,7 +368,7 @@ img.bg-image {
     font-weight: 700;
   }
 
-  li {
+  ul > li {
     &::before {
       content: "\25C6";
       // Decorative: no text for screen readers (browsers without the alt syntax keep the line above)
@@ -376,6 +376,23 @@ img.bg-image {
       margin-block: auto;
       margin-right: 8px;
       color: rgb(var(--tertiary));
+    }
+  }
+
+  // Ordered lists show their numbers (their markers come from this counter, like the bullets above)
+  ol {
+    counter-reset: formatted-list;
+  }
+
+  ol > li {
+    counter-increment: formatted-list;
+
+    &::before {
+      content: counter(formatted-list) ".";
+      margin-block: auto;
+      margin-right: 8px;
+      font-size: inherit;
+      color: inherit;
     }
   }
 }
