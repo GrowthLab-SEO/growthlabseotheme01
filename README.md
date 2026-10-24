@@ -6,6 +6,8 @@ Base WordPress theme that GrowthLab SEO uses to build client sites. It is a clas
 - Repository: <https://github.com/GrowthLab-SEO/growthlabseotheme01>
 - License: GPL-3.0-or-later (see [LICENSE](LICENSE))
 
+> **Child themes and site building:** see [CHILD-THEMES.md](CHILD-THEMES.md) (what the theme loads from a child theme, building it with this theme's gulp, helpers, SCSS tokens, CSS conventions and content guidelines). Files shared by the three GrowthLab themes come from the growthlab-theme-core repository: edit them there (or pull them into it) so the themes stay equal.
+
 ## Contents
 
 - [Overview](#overview)
