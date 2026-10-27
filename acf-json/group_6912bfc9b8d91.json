@@ -164,20 +164,7 @@
             "type": "image",
             "instructions": "",
             "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_6912bfc9c0d17",
-                        "operator": "==",
-                        "value": "1"
-                    },
-                    {
-                        "field": "field_6912bfc9d31b0",
-                        "operator": "==",
-                        "value": "full"
-                    }
-                ]
-            ],
+            "conditional_logic": 0,
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -396,20 +383,7 @@
             "type": "wysiwyg",
             "instructions": "",
             "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_6912bfc9c0d17",
-                        "operator": "==",
-                        "value": "1"
-                    },
-                    {
-                        "field": "field_6912bfc9d31b0",
-                        "operator": "==",
-                        "value": "full"
-                    }
-                ]
-            ],
+            "conditional_logic": 0,
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -451,20 +425,7 @@
             "type": "link",
             "instructions": "",
             "required": 0,
-            "conditional_logic": [
-                [
-                    {
-                        "field": "field_6912bfc9c0d17",
-                        "operator": "==",
-                        "value": "1"
-                    },
-                    {
-                        "field": "field_690e5f0c51fd3",
-                        "operator": "!=",
-                        "value": "1"
-                    }
-                ]
-            ],
+            "conditional_logic": 0,
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -493,5 +454,7 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1773160966
+    "allow_ai_access": false,
+    "ai_description": "",
+    "modified": 1793125984
 }
