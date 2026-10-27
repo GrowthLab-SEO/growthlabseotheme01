@@ -16,8 +16,8 @@ if (get_field('toggle_block')):
         <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
-        if ($box_position === "full" && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "cta-box__bg bg-image gradient-overlay");
-        if ($box_position === "full" && $background_side_image) img_print_picture_tag(img: $background_side_image, is_cover: true, classes: "cta-box__sidebg");
+        if ($box_position === "full" && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "cta-box__bg bg-image gradient-overlay", context: 'block/cta-box/background');
+        if ($box_position === "full" && $background_side_image) img_print_picture_tag(img: $background_side_image, is_cover: true, classes: "cta-box__sidebg", context: 'block/cta-box/side-background');
         ?>
 
         <div class="cta-box__wrapper container">
@@ -26,7 +26,7 @@ if (get_field('toggle_block')):
 
                 <div class="cta-box__decoration">
                     <?php if (isset($options["logo_symbol"]) && $options["logo_symbol"]) {
-                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium");
+                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium", context: 'block/cta-box/logo-symbol');
                     } else {
                         echo get_theme_svg('assets/img/separator-symbol.svg');
                     } ?>

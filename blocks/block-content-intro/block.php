@@ -15,7 +15,7 @@ if (get_field('toggle_block')):
         <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
-        if (isset($background_image) && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "content-intro__bg bg-image gradient-overlay");
+        if (isset($background_image) && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "content-intro__bg bg-image gradient-overlay", context: 'block/content-intro/background');
         ?>
 
         <div class="content-intro__wrapper container">
@@ -46,13 +46,13 @@ if (get_field('toggle_block')):
                     ): ?>
                         <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= esc_attr($featured_image['position']) ?>">
                             <?php
-                            img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "content", classes: "content-intro__pic");
+                            img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "content", classes: "content-intro__pic", context: 'block/content-intro/featured-image');
                             if (isset($featured_image['picture_caption']) && $featured_image['picture_caption']):
                             ?>
 
                                 <div class="content-intro__caption">
                                     <?php if (isset($options["logo_symbol"]) && $options["logo_symbol"]) {
-                                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium");
+                                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium", context: 'block/content-intro/logo-symbol');
                                     } else {
                                         echo get_theme_svg('assets/img/separator-symbol.svg');
                                     } ?>
@@ -79,13 +79,13 @@ if (get_field('toggle_block')):
                     ): ?>
                         <div class="content-intro__pic-wrapper content-intro__pic-wrapper--<?= esc_attr($featured_image['position']) ?>">
                             <?php
-                            img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "medium", classes: "content-intro__pic");
+                            img_print_picture_tag(img: $featured_image['picture'], max_size: "large", min_size: "medium", classes: "content-intro__pic", context: 'block/content-intro/featured-image');
                             if (isset($featured_image['picture_caption']) && $featured_image['picture_caption']):
                             ?>
 
                                 <div class="content-intro__caption">
                                     <?php if (isset($options["logo_symbol"]) && $options["logo_symbol"]) {
-                                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium");
+                                        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium", context: 'block/content-intro/logo-symbol');
                                     } else {
                                         echo get_theme_svg('assets/img/separator-symbol.svg');
                                     } ?>

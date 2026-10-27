@@ -27,7 +27,8 @@ if (!$bg_mobile) $bg_mobile = [];
         mobile_img: $bg_mobile,
         is_cover: true,
         classes: "hero__bg-image bg-image gradient-overlay",
-        is_priority: true
+        is_priority: true,
+        context: 'hero/home/background'
     ); ?>
 
     <div class="hero__wrapper container">
@@ -59,11 +60,11 @@ if (!$bg_mobile) $bg_mobile = [];
                 <div class="hero__badges">
                     <?php foreach ($hero_pictures['badges'] as $badge) {
                         $pic = $badge['badge'] ?? '';
-                        img_print_picture_tag(img: $pic, classes: "hero__badge", is_priority: false, max_size: "medium", min_size: "thumbnail");
+                        img_print_picture_tag(img: $pic, classes: "hero__badge", is_priority: false, max_size: "medium", min_size: "thumbnail", context: 'hero/home/badge');
                     } ?>
                 </div>
             <?php endif ?>
         </div>
-        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true); ?>
+        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true, context: 'hero/home/side-portrait'); ?>
     </div>
 </section>

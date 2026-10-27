@@ -12,7 +12,7 @@ if (get_field('toggle_block')):
         <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
-        if (isset($background_image) && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "trust-cards__bg bg-image gradient-overlay");
+        if (isset($background_image) && $background_image) img_print_picture_tag(img: $background_image, is_cover: true, classes: "trust-cards__bg bg-image gradient-overlay", context: 'block/trust-cards/background');
         ?>
 
         <div class="trust-cards__wrapper container">

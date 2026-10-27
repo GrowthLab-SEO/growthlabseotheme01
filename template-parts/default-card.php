@@ -30,9 +30,9 @@ $read_more_label = sprintf(
             echo '<div class="default-card__pic-wrapper">';
         }
         if (isset($args['picture']) && $args['picture']) {
-            img_print_picture_tag(img: $args["picture"], max_size: "content", min_size: "featured-small", classes: "default-card__pic");
+            img_print_picture_tag(img: $args["picture"], max_size: "content", min_size: "featured-small", classes: "default-card__pic", context: 'card/default/picture');
         } elseif ($default_image) {
-            img_print_picture_tag(img: $default_image, max_size: "content", min_size: "featured-small", classes: "default-card__pic");
+            img_print_picture_tag(img: $default_image, max_size: "content", min_size: "featured-small", classes: "default-card__pic", context: 'card/default/default-image');
         } else {
             echo get_theme_svg('assets/icons/icon-file-image.svg');
         }

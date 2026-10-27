@@ -44,7 +44,7 @@ if (get_field('toggle_block')):
                                         <div class="item-card splide__slide">
                                             <div class="item-card__inner">
                                                 <div class="item-card__icon">
-                                                    <?php img_print_picture_tag(img: $item['icon'] ?? '', classes: 'item-card__icon-img', max_size: "thumbnail") ?>
+                                                    <?php img_print_picture_tag(img: $item['icon'] ?? '', classes: 'item-card__icon-img', max_size: "thumbnail", context: 'block/selling-points/icon') ?>
                                                 </div>
 
                                                 <?php

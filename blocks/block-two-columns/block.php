@@ -17,7 +17,7 @@ if (get_field('toggle_block')):
         <?= get_block_extract_attribute($extract_block_from_content ?? false, $place ?? '') ?>>
 
         <?php
-        if ($background_type === "img" && !empty($background_image)) img_print_picture_tag(img: $background_image, is_cover: true, classes: "two-columns__bg bg-image gradient-overlay");
+        if ($background_type === "img" && !empty($background_image)) img_print_picture_tag(img: $background_image, is_cover: true, classes: "two-columns__bg bg-image gradient-overlay", context: 'block/two-columns/background');
         if (!empty($show_top_separator)) get_template_part("template-parts/ampersand", "separator", ["classes" => "two-columns__separator container"]);
         ?>
 
@@ -48,7 +48,8 @@ if (get_field('toggle_block')):
                         img: $image,
                         max_size: "large",
                         min_size: "content",
-                        classes: "two-columns__image $reverse"
+                        classes: "two-columns__image $reverse",
+                        context: 'block/two-columns/image'
                     );
                     ?>
                 </div>

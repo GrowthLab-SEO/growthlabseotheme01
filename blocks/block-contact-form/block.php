@@ -28,7 +28,7 @@ if (get_field('toggle_block')):
             if (isset($side_picture) && $side_picture && !$title && !$main_content && !$background_image) echo "bg-bicolor ";
             ?>
             ">
-                <?php if (isset($background_image) && $background_image && !$show_only_contact_form) img_print_picture_tag(img: $background_image, is_cover: true, classes: "contact-form__bg bg-image gradient-overlay"); ?>
+                <?php if (isset($background_image) && $background_image && !$show_only_contact_form) img_print_picture_tag(img: $background_image, is_cover: true, classes: "contact-form__bg bg-image gradient-overlay", context: 'block/contact-form/background'); ?>
 
                 <div class="contact-form__inner container <?php if (!$show_only_contact_form) echo "border-box" ?>">
 
@@ -86,7 +86,7 @@ if (get_field('toggle_block')):
                         </div>
                     <?php endif; ?>
 
-                    <?php if (isset($side_picture) && $side_picture && !$show_only_contact_form) img_print_picture_tag(img: $side_picture, max_size: "large", min_size: "medium", classes: "contact-form__side-pic shadow-box"); ?>
+                    <?php if (isset($side_picture) && $side_picture && !$show_only_contact_form) img_print_picture_tag(img: $side_picture, max_size: "large", min_size: "medium", classes: "contact-form__side-pic shadow-box", context: 'block/contact-form/side-image'); ?>
                 </div>
 
             </div>

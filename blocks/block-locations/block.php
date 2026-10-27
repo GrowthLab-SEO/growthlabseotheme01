@@ -31,7 +31,7 @@ if (get_field('toggle_block')):
                     <div class="location-card location-card--first">
                         <div class="location-card__wrapper">
                             <div class="location-card__inner flex-center">
-                                <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
+                                <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo", context: 'block/office-locations/office-logo'); ?>
                                 <div class="location-card__content tx-center">
                                     <?= $first_card['content'] ?? '' ?>
                                 </div>
@@ -62,7 +62,7 @@ if (get_field('toggle_block')):
                                         <div class="location-card location-card--first">
                                             <div class="location-card__wrapper">
                                                 <div class="location-card__inner flex-center">
-                                                    <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
+                                                    <?php if ($first_card['logo']) img_print_picture_tag(img: $first_card['logo'], max_size: "thumbnail",  classes: "location-card__logo", context: 'block/office-locations/office-logo'); ?>
                                                     <div class="location-card__content tx-center">
                                                         <?= $first_card['content'] ?? '' ?>
                                                     </div>

@@ -22,7 +22,7 @@ if (!$bg_mobile) $bg_mobile = [];
 ?>
 <section id="hero-homepage" class="hero hero--homepage hero--v4">
 
-    <?php if (!empty($bg_desktop)) img_print_picture_tag(img: $bg_desktop, tablet_img: $bg_tablet, mobile_img: $bg_mobile, is_cover: true, classes: "hero__bg-image bg-image gradient-overlay", is_priority: true); ?>
+    <?php if (!empty($bg_desktop)) img_print_picture_tag(img: $bg_desktop, tablet_img: $bg_tablet, mobile_img: $bg_mobile, is_cover: true, classes: "hero__bg-image bg-image gradient-overlay", is_priority: true, context: 'hero/home_4/background'); ?>
 
     <div class="hero__wrapper container">
 
@@ -59,7 +59,7 @@ if (!$bg_mobile) $bg_mobile = [];
             </div>
         </div>
 
-        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true); ?>
+        <?php if (!empty($hero_pictures['side_portrait'])) img_print_picture_tag(img: $hero_pictures['side_portrait'], max_size: "content", min_size: "featured-small", classes: "hero__side-portrait", is_priority: true, context: 'hero/home_4/side-portrait'); ?>
 
     </div>
 </section>

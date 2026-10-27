@@ -20,7 +20,7 @@
       <section class="contact-form-footer">
 
         <div class="contact-form-footer__wrapper">
-          <?php if (!empty($form_section['background_image'])) img_print_picture_tag(img: $form_section['background_image'], is_cover: true, classes: "contact-form-footer__bg bg-image gradient-overlay"); ?>
+          <?php if (!empty($form_section['background_image'])) img_print_picture_tag(img: $form_section['background_image'], is_cover: true, classes: "contact-form-footer__bg bg-image gradient-overlay", context: 'footer/form-background'); ?>
 
           <div class="contact-form-footer__inner container">
 
@@ -50,7 +50,7 @@
 
             </div>
 
-            <?php if (!empty($form_section['side_picture'])) img_print_picture_tag(img: $form_section['side_picture'], max_size: "large", min_size: "content",  classes: "contact-form-footer__side-pic shadow-box"); ?>
+            <?php if (!empty($form_section['side_picture'])) img_print_picture_tag(img: $form_section['side_picture'], max_size: "large", min_size: "content",  classes: "contact-form-footer__side-pic shadow-box", context: 'footer/form-side-image'); ?>
           </div>
 
         </div>
@@ -81,7 +81,7 @@
               <div class="location-card location-card--first">
                 <div class="location-card__wrapper">
                   <div class="location-card__inner flex-center">
-                    <?php if (!empty($locations_section['first_card']['logo'])) img_print_picture_tag(img: $locations_section['first_card']['logo'], max_size: "thumbnail",  classes: "location-card__logo"); ?>
+                    <?php if (!empty($locations_section['first_card']['logo'])) img_print_picture_tag(img: $locations_section['first_card']['logo'], max_size: "thumbnail",  classes: "location-card__logo", context: 'footer/office-logo'); ?>
                     <div class="location-card__content tx-center">
                       <?= $locations_section['first_card']['content'] ?>
                     </div>

@@ -11,7 +11,7 @@ $options = get_field_options('options' . $es);
     <hr>
     <?php
     if (isset($options["logo_symbol"]) && $options["logo_symbol"]) {
-        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium");
+        img_print_picture_tag(img: $options["logo_symbol"], max_size: "medium", context: 'separator/logo-symbol');
     } else {
         echo get_theme_svg('assets/img/separator-symbol.svg');
     }
